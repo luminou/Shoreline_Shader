@@ -46,7 +46,7 @@ p{max-width:64ch;text-wrap:pretty;margin:0 0 14px}
 .hero .lead{color:#e3e9f9;max-width:36em}
 .hero-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:44px;align-items:end}
 .live{margin:0;position:relative}
-.hvs{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 18px 40px -20px rgba(0,0,0,.6)}.hvs video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease}.hvs video.on{opacity:1}.hdots{display:inline-flex;gap:6px;align-items:center}.hdots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);transition:background .4s}.hdots i.on{background:#fff}
+.hvs{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 18px 40px -20px rgba(0,0,0,.6)}.hvs video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease}.hvs video.on{opacity:1}.hdots{display:inline-flex;gap:2px;align-items:center}.live .hdots button{-webkit-appearance:none;appearance:none;width:22px;height:22px;padding:0;border:0;background:transparent;cursor:pointer;display:grid;place-items:center}.live .hdots button::before{content:"";width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.35);transition:background .4s,transform .3s}.live .hdots button.on::before{background:#fff;transform:scale(1.15)}.live .hdots button:focus-visible{outline:2px solid #fff;border-radius:50%}.live .harr{-webkit-appearance:none;appearance:none;position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:38px;height:38px;border-radius:50%;border:0;background:rgba(19,29,59,.55);color:#fff;font:400 28px/1 system-ui,sans-serif;display:grid;place-items:center;padding:0 0 3px;cursor:pointer;opacity:.85;transition:opacity .2s,background .2s}.live .harr:hover{opacity:1;background:rgba(19,29,59,.8)}.live .harr.prev{left:10px}.live .harr.next{right:10px}@media (hover:hover){.live .harr{opacity:0}.live .hvs:hover .harr{opacity:.85}}
 
 .live canvas{display:block;width:100%;aspect-ratio:16/10;border-radius:8px 8px 0 0;background:#9e9784}
 .live figcaption{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 12.5px/1.4 var(--f-mono);color:#c6d1ee;padding:12px 0 18px}
@@ -68,14 +68,14 @@ p{max-width:64ch;text-wrap:pretty;margin:0 0 14px}
 .shot figcaption{font-size:15px;line-height:1.5;color:var(--muted)}
 .shot figcaption b{display:block;color:var(--ink);font-family:var(--f-display);font-size:17px;margin-bottom:2px}
 .shot.wide{grid-column:span 2}
-.demo-fig{margin-top:34px}
-.res-top{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:28px;margin-top:30px;align-items:start}
+.demo-fig{margin-top:26px}.gallery.g3b{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:0}.gallery.behind{grid-template-columns:minmax(0,1fr) minmax(0,2fr);margin-top:0;align-items:start}.gallery.behind .vbox video{aspect-ratio:16/9;object-fit:contain;background:#fff}@media (max-width:900px){.gallery.g3b,.gallery.behind{grid-template-columns:minmax(0,1fr)}}.res-h{font:700 13px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:34px 0 14px;padding-top:16px;border-top:1px solid var(--line)}.res-h+.res-top,.res-h+.gallery{margin-top:0}.shot.cr>video,.shot.cr>img.vfb{aspect-ratio:1.4/1!important;object-fit:cover!important;background:#fff}
+.res-top{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:28px;margin-top:30px;align-items:start}
 .res-left{display:grid;gap:22px}
 .res-stack{display:grid;gap:10px;align-content:start;background:rgba(255,255,255,.35);border:1px solid var(--line);border-radius:10px;padding:20px 20px 26px}
 .res-stack .recipe-txt h3{margin:0 0 4px}.res-stack .recipe-txt p{margin:0 0 6px}
 .res-stack .stk{margin:18px auto 0;max-width:205px}
 .res-stack .ltag{left:50%;margin-left:0;transform:translate(-50%,-50%) scale(.6)}.res-stack .ltag.on{transform:translate(-50%,-50%) scale(1)}
-.gallery.g3{grid-template-columns:repeat(4,minmax(0,1fr))}.gallery.g2 .shot>video,.gallery.g2 .vbox video{aspect-ratio:16/9;object-fit:contain;background:#fff}.gallery.g2{row-gap:30px}.gallery.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gallery.g3{grid-template-columns:repeat(4,minmax(0,1fr))}.gallery.g2 .shot>video,.gallery.g2 .vbox video{aspect-ratio:16/9;object-fit:contain;background:#fff}.gallery.g2{row-gap:24px;margin-top:0}.gallery.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .gallery.g3 .shot>video,.gallery.g3 .vbox video{aspect-ratio:16/9;object-fit:contain;background:#fff}.gallery.g3{row-gap:30px}.gallery.g3 .pair video{aspect-ratio:8/9;object-fit:cover;background:#fff}
 @media (max-width:1100px){.gallery.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:900px){.res-top{grid-template-columns:minmax(0,1fr)}.gallery.g3,.gallery.g2{grid-template-columns:minmax(0,1fr)}}
 
@@ -247,7 +247,7 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
       <p class="lead"><span class="l-en">Six months in the R&amp;D team of OLM Digital, the Japanese animation studio known for the Pokémon films, developing a procedural Maya shader that recreates hand-drawn anime water in 3D.</span><span class="l-fr">Six mois au sein de l'équipe R&amp;D d'OLM Digital, studio d'animation japonais connu pour les films Pokémon, à développer un shader procédural pour Maya qui reproduit en 3D l'eau dessinée à la main de l'animation japonaise.</span></p>
       
     </div>
-    <figure class="live hero-renders"><div class="hvs"><video autoplay loop muted playsinline class="hv on" webkit-playsinline preload="auto" poster="media/b466276f61.jpg" aria-label="Default look"><source src="media/b466276f61.mp4" type="video/mp4"></video><video autoplay loop muted playsinline class="hv" webkit-playsinline preload="auto" poster="media/a069b55946.jpg" aria-label="Turquoise look"><source src="media/a069b55946.mp4" type="video/mp4"></video><video autoplay loop muted playsinline class="hv" webkit-playsinline preload="auto" poster="media/4608fa0e4c.jpg" aria-label="Red sea look"><source src="media/4608fa0e4c.mp4" type="video/mp4"></video></div><figcaption><span><span class="l-en">Renders from the tool: default look, tropical sea, red sea.</span><span class="l-fr">Rendus de l'outil : réglages par défaut, mer tropicale, mer rouge.</span></span><span class="hdots" aria-hidden="true"><i class="on"></i><i></i><i></i></span></figcaption></figure>
+    <figure class="live hero-renders"><div class="hvs"><video autoplay loop muted playsinline class="hv on" webkit-playsinline preload="auto" poster="media/b466276f61.jpg" aria-label="Default look"><source src="media/b466276f61.mp4" type="video/mp4"></video><video autoplay loop muted playsinline class="hv" webkit-playsinline preload="auto" poster="media/a069b55946.jpg" aria-label="Turquoise look"><source src="media/a069b55946.mp4" type="video/mp4"></video><video autoplay loop muted playsinline class="hv" webkit-playsinline preload="auto" poster="media/4608fa0e4c.jpg" aria-label="Red sea look"><source src="media/4608fa0e4c.mp4" type="video/mp4"></video><button type="button" class="harr prev" aria-label="Previous / Précédent">&#8249;</button><button type="button" class="harr next" aria-label="Next / Suivant">&#8250;</button></div><figcaption><span><span class="l-en">Renders from the tool: default look, tropical sea, red sea.</span><span class="l-fr">Rendus de l'outil : réglages par défaut, mer tropicale, mer rouge.</span></span><span class="hdots" role="group" aria-label="Renders"><button type="button" class="on" aria-label="1"></button><button type="button" aria-label="2"></button><button type="button" aria-label="3"></button></span></figcaption></figure>
   </div>
   <div class="shore" aria-hidden="true"></div>
 </header>
@@ -276,13 +276,13 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
     <p class="kicker"><span class="l-en">The result</span><span class="l-fr">Le résultat</span></p>
     <h2><span class="l-en">One tool, many seas</span><span class="l-fr">Un outil, de nombreuses mers</span></h2>
     <p class="lead"><span class="l-en">Everything can be adjusted: wave speed, water color, the shape of the foam cells, splashes, how fast the sand dries.</span><span class="l-fr">Tout est réglable : vitesse des vagues, couleur de l'eau, forme des cellules d'écume, éclaboussures, séchage du sable.</span></p>
-    <div class="res-top"><div class="res-left"><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/b466276f61.jpg" aria-label="Final render"><source src="media/b466276f61.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Final render</span><span class="l-fr">Rendu final</span></b><span class="l-en">Three waves come in, appear as dashes, merge into a foam line, then pull back and leave wet sand behind.</span><span class="l-fr">Trois vagues arrivent, apparaissent en pointillés, forment une ligne d'écume, puis reculent en laissant le sable mouillé.</span></figcaption></figure></div><div class="res-stack"><div class="recipe-txt">
+    <h3 class="res-h"><span class="l-en">The final render</span><span class="l-fr">Le rendu final</span></h3><div class="res-top"><div class="res-left"><figure class="shot cr"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/b466276f61r.jpg" aria-label="Final render"><source src="media/b466276f61r.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Final render</span><span class="l-fr">Rendu final</span></b><span class="l-en">Three waves come in, appear as dashes, merge into a foam line, then pull back and leave wet sand behind.</span><span class="l-fr">Trois vagues arrivent, apparaissent en pointillés, forment une ligne d'écume, puis reculent en laissant le sable mouillé.</span></figcaption></figure></div><div class="res-stack"><div class="recipe-txt">
         <h3><span class="l-en">One image, seven layers</span><span class="l-fr">Une image, sept couches</span></h3>
         <p><span class="l-en">The final image stacks seven layers, like layers in a painting program. Each has its own mask, which defines where it appears.</span><span class="l-fr">L'image finale superpose sept couches, comme des calques. Chacune a son propre masque, qui définit où elle apparaît.</span></p>
         <p class="recipe-hint"><span class="l-en">Hover a layer to bring it forward.</span><span class="l-fr">Survolez une couche pour la faire ressortir.</span></p>
       </div><div class="stk" id="stk" role="img" aria-label="Seven stacked layers"><img class="pl" data-i="0" src="media/layer_sand.webp" alt="" style="top:63.257%;z-index:1" draggable="false"><img class="pl" data-i="1" src="media/layer_wet.webp" alt="" style="top:52.714%;z-index:2" draggable="false"><img class="pl" data-i="2" src="media/layer_water.webp" alt="" style="top:42.172%;z-index:3" draggable="false"><img class="pl" data-i="3" src="media/layer_veins.webp" alt="" style="top:31.629%;z-index:4" draggable="false"><img class="pl" data-i="4" src="media/layer_shadow.webp" alt="" style="top:21.086%;z-index:5" draggable="false"><img class="pl" data-i="5" src="media/layer_foam.webp" alt="" style="top:10.543%;z-index:6" draggable="false"><img class="pl" data-i="6" src="media/layer_splash.webp" alt="" style="top:0.000%;z-index:7" draggable="false">
         <span class="ltag" id="ltag"></span></div>
-    </div></div><div class="gallery g2 big"><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/a069b55946.jpg" aria-label="Turquoise look"><source src="media/a069b55946.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Tropical sea</span><span class="l-fr">Mer tropicale</span></b><span class="l-en">Turquoise gradient water, obtained through settings only.</span><span class="l-fr">Eau turquoise en dégradé, obtenue uniquement par les réglages.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4608fa0e4c.jpg" aria-label="Red sea look"><source src="media/4608fa0e4c.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Red sea</span><span class="l-fr">Mer rouge</span></b><span class="l-en">A nod to the sea in <i>Evangelion</i>.</span><span class="l-fr">Un clin d'œil à la mer d'<i>Evangelion</i>.</span></figcaption></figure></div><div class="gallery g2"><figure class="shot"><div class="vbox"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/d659c91150.jpg" aria-label="Debug view of fronts A, B, C"><source src="media/d659c91150.mp4" type="video/mp4"></video><img class="legend-inset" src="media/30fc14f070.webp" alt="A magenta, B cyan, C yellow"></div><figcaption><b><span class="l-en">Three waves</span><span class="l-fr">Trois vagues</span></b><span class="l-en">Debug view: each color is one wave.</span><span class="l-fr">Vue de debug : chaque couleur est une vague.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4d5ac73766.jpg" aria-label="Height displacement"><source src="media/4d5ac73766.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">With relief</span><span class="l-fr">Avec relief</span></b><span class="l-en">Optional height displacement gives the wave some relief.</span><span class="l-fr">En option, un déplacement en hauteur donne du relief à la vague.</span></figcaption></figure></div><figure class="shot demo-fig"><video autoplay loop muted playsinline preload="metadata" poster="media/demo_x8c.jpg" aria-label="Shader controls demo in Maya, 8x speed"><source src="media/demo_x8c.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">In Maya</span><span class="l-fr">Dans Maya</span></b><span class="l-en">The tool's settings, edited on its control node while the render updates.</span><span class="l-fr">Les réglages de l'outil, modifiés sur son nœud de contrôle pendant que le rendu se met à jour.</span></figcaption></figure>
+    </div></div><h3 class="res-h"><span class="l-en">Other looks, same tool</span><span class="l-fr">D'autres ambiances, le même outil</span></h3><div class="gallery g3b"><figure class="shot cr"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/a069b55946r.jpg" aria-label="Turquoise look"><source src="media/a069b55946r.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Tropical sea</span><span class="l-fr">Mer tropicale</span></b><span class="l-en">Turquoise gradient water, obtained through settings only.</span><span class="l-fr">Eau turquoise en dégradé, obtenue uniquement par les réglages.</span></figcaption></figure><figure class="shot cr"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4608fa0e4cr.jpg" aria-label="Red sea look"><source src="media/4608fa0e4cr.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Red sea</span><span class="l-fr">Mer rouge</span></b><span class="l-en">A nod to the sea in <i>Evangelion</i>.</span><span class="l-fr">Un clin d'œil à la mer d'<i>Evangelion</i>.</span></figcaption></figure><figure class="shot cr"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4d5ac73766.jpg" aria-label="Height displacement"><source src="media/4d5ac73766.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">With relief</span><span class="l-fr">Avec relief</span></b><span class="l-en">Optional height displacement gives the wave some relief.</span><span class="l-fr">En option, un déplacement en hauteur donne du relief à la vague.</span></figcaption></figure></div><h3 class="res-h"><span class="l-en">Behind the scenes</span><span class="l-fr">Dans les coulisses</span></h3><div class="gallery behind"><figure class="shot"><div class="vbox"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/d659c91150.jpg" aria-label="Debug view of fronts A, B, C"><source src="media/d659c91150.mp4" type="video/mp4"></video><img class="legend-inset" src="media/30fc14f070.webp" alt="A magenta, B cyan, C yellow"></div><figcaption><b><span class="l-en">Three waves</span><span class="l-fr">Trois vagues</span></b><span class="l-en">Debug view: each color is one wave.</span><span class="l-fr">Vue de debug : chaque couleur est une vague.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline preload="metadata" poster="media/demo_x8c.jpg" aria-label="Shader controls demo in Maya, 8x speed"><source src="media/demo_x8c.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">In Maya</span><span class="l-fr">Dans Maya</span></b><span class="l-en">The tool's settings, edited on its control node while the render updates.</span><span class="l-fr">Les réglages de l'outil, modifiés sur son nœud de contrôle pendant que le rendu se met à jour.</span></figcaption></figure></div>
   </div>
 </section>
 
@@ -440,7 +440,7 @@ Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">
 
 
 (function(){
-  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduce = false;
 
   /* ---------- formulas (MathML output, no stylesheet needed) ---------- */
   if (window.katex) [].forEach.call(document.querySelectorAll('.tex[data-tex]'), function(el){
@@ -815,7 +815,7 @@ window.OlmSea = (function(){
 })();
 
 (function(){
-  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduce=false;
   var cv=document.getElementById('pg'); if(!cv) return;
   var sea=OlmSea.create(cv), running=!reduce, t0=performance.now(), offset=6, last=0, btn=document.getElementById('pg-play');
   function now(){ return running ? offset+(performance.now()-t0)/1000 : offset; }
@@ -877,7 +877,7 @@ window.OlmSea = (function(){
   // Each video gets ~2.5 s after it becomes visible; if it has not started playing by then,
   // it is replaced by the same animation as an animated WebP image (media/<name>_a.webp),
   // which every current browser plays without any autoplay rule.
-  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduce=false;
   if(reduce||!('IntersectionObserver' in window)) return;
   var COPY=['position','left','top','right','bottom','objectFit','objectPosition','borderRadius','display','boxShadow','backgroundColor','zIndex','transform','transformOrigin','maxWidth','maxHeight','verticalAlign'];
   function url(v){ var s=v.querySelector('source'); return (s&&(s.getAttribute('src')||s.getAttribute('data-src')))||v.getAttribute('src')||v.getAttribute('data-src')||''; }
@@ -919,13 +919,23 @@ window.OlmSea = (function(){
 
 <script>
 (function(){
-  var vs=[].slice.call(document.querySelectorAll('.hvs video')), dots=[].slice.call(document.querySelectorAll('.hdots i')), k=0;
+  var vs=[].slice.call(document.querySelectorAll('.hvs video')), dots=[].slice.call(document.querySelectorAll('.hdots button')), k=0, timer=null;
   if(vs.length<2) return;
-  setInterval(function(){
-    var n=(k+1)%vs.length, v=vs[n];
+  function go(n){
+    n=(n+vs.length)%vs.length; if(n===k) return; var v=vs[n];
     try{ v.currentTime=0; }catch(e){} var p=v.play(); if(p&&p.catch)p.catch(function(){});
     vs[k].classList.remove('on'); v.classList.add('on'); dots[k]&&dots[k].classList.remove('on'); dots[n]&&dots[n].classList.add('on'); k=n;
-  },6000);
+  }
+  function auto(){ clearInterval(timer); timer=setInterval(function(){ go(k+1); },6000); }
+  dots.forEach(function(d,i){ d.addEventListener('click',function(){ go(i); auto(); }); });
+  var pv=document.querySelector('.harr.prev'), nx=document.querySelector('.harr.next');
+  if(pv) pv.addEventListener('click',function(){ go(k-1); auto(); });
+  if(nx) nx.addEventListener('click',function(){ go(k+1); auto(); });
+  // swipe on touch screens
+  var box=document.querySelector('.hvs'), x0=null;
+  box.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
+  box.addEventListener('touchend',function(e){ if(x0==null) return; var dx=e.changedTouches[0].clientX-x0; if(Math.abs(dx)>40){ go(k+(dx<0?1:-1)); auto(); } x0=null; },{passive:true});
+  auto();
 })();
 </script>
 </body>

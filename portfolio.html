@@ -212,7 +212,7 @@ Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">
 })();
 
 (function(){
-  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduce=false;
   var vids=[].slice.call(document.querySelectorAll('video'));
   if('IntersectionObserver' in window){
     var vo=new IntersectionObserver(function(es){ es.forEach(function(e){ var v=e.target; if(e.isIntersecting){ if(!reduce){ var p=v.play(); if(p&&p.catch)p.catch(function(){}); } } else v.pause(); }); },{rootMargin:'200px 0px'});
@@ -252,14 +252,14 @@ Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">
   lbl(L,BY+36,'sea','large',{'font-size':11}); lbl(R,BY+36,'beach','plage',{'font-size':11,'text-anchor':'end'});
   function place(t){ var x=Math.min(1.5,pos(t)); dot.setAttribute('cx',gx(t)); dot.setAttribute('cy',gy(x));
     var w=Math.max(0,Math.min(R-L,bx(x)-L)); water.setAttribute('width',w); foam.setAttribute('x',L+w-3); }
-  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduce=false;
   place(0.38);
   window.__plotPlace=function(t){ place((t/8+0.38)%1); };
   if(!reduce){ var t0=performance.now(); (function a(now){ if(!window.__freeze) place(((now-t0)/8000+0.38)%1); requestAnimationFrame(a); })(t0); }
 })();
 
 (function(){
-  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduce=false;
   var b6=document.getElementById('b6'), KEYS=["start","scale","norm","ease","amount","smooth","progress"], FS=16/KEYS.length;
   window.__fxAt=function(t){ if(!b6) return; var k=KEYS[Math.floor((t%16)/FS)]; if(b6.dataset.hl!==k) b6.dataset.hl=k; };
   var box=document.getElementById('stk2'), tag=document.getElementById('cltag');
@@ -286,7 +286,7 @@ Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">
   // Each video gets ~2.5 s after it becomes visible; if it has not started playing by then,
   // it is replaced by the same animation as an animated WebP image (media/<name>_a.webp),
   // which every current browser plays without any autoplay rule.
-  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduce=false;
   if(reduce||!('IntersectionObserver' in window)) return;
   var COPY=['position','left','top','right','bottom','objectFit','objectPosition','borderRadius','display','boxShadow','backgroundColor','zIndex','transform','transformOrigin','maxWidth','maxHeight','verticalAlign'];
   function url(v){ var s=v.querySelector('source'); return (s&&(s.getAttribute('src')||s.getAttribute('data-src')))||v.getAttribute('src')||v.getAttribute('data-src')||''; }
