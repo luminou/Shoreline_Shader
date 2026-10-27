@@ -45,31 +45,50 @@ footer{color:var(--muted);font-size:14px;margin-top:40px}
   </div>
   <footer>Clémentine Garoche · Tech art / environment art · Montpellier</footer>
 </main>
+<style>.hvs img.vfb{opacity:0;transition:opacity 1.2s ease}.hvs img.vfb.on{opacity:1}</style>
 <script>
 (function(){
-  // Safari / WebKit: load each video as a local blob (works even if the host refuses byte-range requests
-  // or sends the wrong content type), then play it when visible. Also start videos on the first interaction.
-  var ua=navigator.userAgent, WK=/AppleWebKit/.test(ua)&&!/Chrome\/|Chromium|Edg\/|Android|Firefox\//.test(ua);
+  // Video fallback. Some browsers (Safari, Brave) show only the first frame of the MP4s on these pages.
+  // Each video gets ~2.5 s after it becomes visible; if it has not started playing by then,
+  // it is replaced by the same animation as an animated WebP image (media/<name>_a.webp),
+  // which every current browser plays without any autoplay rule.
   var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function vis(v){ var r=v.getBoundingClientRect(); return r.width>0&&r.bottom>0&&r.top<innerHeight; }
-  function go(v){ if(reduce||!v.paused||!vis(v)) return; v.muted=true; v.setAttribute('playsinline',''); var p=v.play(); if(p&&p.catch)p.catch(function(){}); }
-  function blobify(v){
-    if(v.__bl) return; var u=v.getAttribute('data-src')||v.getAttribute('src'); if(!u||/^blob:/.test(u)) return; v.__bl=1;
-    fetch(u).then(function(r){ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(function(buf){
-      var bu=URL.createObjectURL(new Blob([buf],{type:'video/mp4'}));
-      if(v.hasAttribute('data-src')) v.setAttribute('data-src',bu);
-      v.muted=true; v.setAttribute('playsinline',''); v.src=bu; go(v);
-    }).catch(function(){ v.__bl=0; });
+  if(reduce||!('IntersectionObserver' in window)) return;
+  var COPY=['position','left','top','right','bottom','objectFit','objectPosition','borderRadius','display','boxShadow','backgroundColor','zIndex','transform','transformOrigin','maxWidth','maxHeight','verticalAlign'];
+  function url(v){ var s=v.querySelector('source'); return (s&&(s.getAttribute('src')||s.getAttribute('data-src')))||v.getAttribute('src')||v.getAttribute('data-src')||''; }
+  function playing(v){ return !v.paused&&v.currentTime>0.05&&v.readyState>=2; }
+  function swap(v){
+    if(v.__fb||playing(v)) return; var u=url(v); if(!/\.mp4(\?|$)/.test(u)) return; v.__fb=1;
+    var cs=getComputedStyle(v), r=v.getBoundingClientRect(), p=v.parentElement, pr=p.getBoundingClientRect();
+    var img=new Image(); img.decoding='async'; img.alt=v.getAttribute('aria-label')||'';
+    img.className=(v.getAttribute('class')||'')+' vfb'; img.setAttribute('style',v.getAttribute('style')||'');
+    COPY.forEach(function(k){ if(!v.style[k]) img.style[k]=cs[k]; });
+    if(!v.style.width) img.style.width=(Math.abs(r.width-pr.width)<2)?'100%':(r.width+'px');
+    if(!v.style.height){ if(cs.position==='absolute'||cs.objectFit!=='fill'&&cs.aspectRatio==='auto') img.style.height=(cs.position==='absolute'&&Math.abs(r.height-pr.height)<2)?'100%':(r.height+'px'); else img.style.height='auto'; }
+    if(cs.aspectRatio&&cs.aspectRatio!=='auto') img.style.aspectRatio=cs.aspectRatio;
+    if(cs.objectFit==='fill') img.style.objectFit='contain';
+    img.onload=function(){ v.style.display='none'; try{ v.pause(); }catch(e){} };
+    img.onerror=function(){ img.remove(); };
+    img.src=u.replace(/\.mp4(\?.*)?$/,'_a.webp');
+    p.insertBefore(img,v);
+    v.__img=img;
+    // keep classes in sync (e.g. the cross-fading hero)
+    new MutationObserver(function(){ img.className=(v.getAttribute('class')||'')+' vfb'; }).observe(v,{attributes:true,attributeFilter:['class']});
   }
-  if(WK&&'IntersectionObserver' in window&&window.fetch&&window.URL&&URL.createObjectURL){
-    var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) blobify(e.target); }); },{rootMargin:'400px 0px'});
-    function scan(){ [].forEach.call(document.querySelectorAll('video'),function(v){ if(!v.__io){ v.__io=1; io.observe(v); } }); }
-    scan(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',scan);
-  }
-  var t=0;
-  function kick(){ if(t) return; t=setTimeout(function(){t=0;},400); [].forEach.call(document.querySelectorAll('video'),function(v){ if(v.getAttribute('src')||v.currentSrc) go(v); }); }
-  ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){ addEventListener(ev,kick,{passive:true}); });
+  var timers=new WeakMap();
+  var io=new IntersectionObserver(function(es){ es.forEach(function(e){
+    var v=e.target;
+    if(e.isIntersecting){ if(!timers.get(v)) timers.set(v,setTimeout(function(){ timers.delete(v); var r=v.getBoundingClientRect(); if(r.width>0) swap(v); },3000)); }
+    else { clearTimeout(timers.get(v)); timers.delete(v); }
+  }); },{threshold:0.15});
+  function scan(){ [].forEach.call(document.querySelectorAll('video'),function(v){ if(!v.__io){ v.__io=1; io.observe(v); } }); }
+  scan(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',scan);
+  // try once more to start everything on the first interaction
+  var once=false;
+  function kick(){ if(once) return; once=true; [].forEach.call(document.querySelectorAll('video'),function(v){ if(v.paused&&!v.__fb){ v.muted=true; var p=v.play(); if(p&&p.catch)p.catch(function(){}); } }); }
+  ['pointerdown','touchstart','keydown'].forEach(function(ev){ addEventListener(ev,kick,{passive:true}); });
 })();
 </script>
+
 </body>
 </html>

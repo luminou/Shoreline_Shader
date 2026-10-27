@@ -75,7 +75,7 @@ p{max-width:64ch;text-wrap:pretty;margin:0 0 14px}
 .res-stack .recipe-txt h3{margin:0 0 4px}.res-stack .recipe-txt p{margin:0 0 6px}
 .res-stack .stk{margin:18px auto 0;max-width:205px}
 .res-stack .ltag{left:50%;margin-left:0;transform:translate(-50%,-50%) scale(.6)}.res-stack .ltag.on{transform:translate(-50%,-50%) scale(1)}
-.gallery.g3{grid-template-columns:repeat(4,minmax(0,1fr))}.gallery.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gallery.g3{grid-template-columns:repeat(4,minmax(0,1fr))}.gallery.g2 .shot>video,.gallery.g2 .vbox video{aspect-ratio:16/9;object-fit:contain;background:#fff}.gallery.g2{row-gap:30px}.gallery.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .gallery.g3 .shot>video,.gallery.g3 .vbox video{aspect-ratio:16/9;object-fit:contain;background:#fff}.gallery.g3{row-gap:30px}.gallery.g3 .pair video{aspect-ratio:8/9;object-fit:cover;background:#fff}
 @media (max-width:1100px){.gallery.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:900px){.res-top{grid-template-columns:minmax(0,1fr)}.gallery.g3,.gallery.g2{grid-template-columns:minmax(0,1fr)}}
 
@@ -282,7 +282,7 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
         <p class="recipe-hint"><span class="l-en">Hover a layer to bring it forward.</span><span class="l-fr">Survolez une couche pour la faire ressortir.</span></p>
       </div><div class="stk" id="stk" role="img" aria-label="Seven stacked layers"><img class="pl" data-i="0" src="media/layer_sand.webp" alt="" style="top:63.257%;z-index:1" draggable="false"><img class="pl" data-i="1" src="media/layer_wet.webp" alt="" style="top:52.714%;z-index:2" draggable="false"><img class="pl" data-i="2" src="media/layer_water.webp" alt="" style="top:42.172%;z-index:3" draggable="false"><img class="pl" data-i="3" src="media/layer_veins.webp" alt="" style="top:31.629%;z-index:4" draggable="false"><img class="pl" data-i="4" src="media/layer_shadow.webp" alt="" style="top:21.086%;z-index:5" draggable="false"><img class="pl" data-i="5" src="media/layer_foam.webp" alt="" style="top:10.543%;z-index:6" draggable="false"><img class="pl" data-i="6" src="media/layer_splash.webp" alt="" style="top:0.000%;z-index:7" draggable="false">
         <span class="ltag" id="ltag"></span></div>
-    </div></div><div class="gallery g3"><figure class="shot"><div class="vbox"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/d659c91150.jpg" aria-label="Debug view of fronts A, B, C"><source src="media/d659c91150.mp4" type="video/mp4"></video><img class="legend-inset" src="media/30fc14f070.webp" alt="A magenta, B cyan, C yellow"></div><figcaption><b><span class="l-en">Three waves</span><span class="l-fr">Trois vagues</span></b><span class="l-en">Debug view: each color is one wave.</span><span class="l-fr">Vue de debug : chaque couleur est une vague.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/a069b55946.jpg" aria-label="Turquoise look"><source src="media/a069b55946.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Tropical sea</span><span class="l-fr">Mer tropicale</span></b><span class="l-en">Turquoise gradient water, obtained through settings only.</span><span class="l-fr">Eau turquoise en dégradé, obtenue uniquement par les réglages.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4608fa0e4c.jpg" aria-label="Red sea look"><source src="media/4608fa0e4c.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Red sea</span><span class="l-fr">Mer rouge</span></b><span class="l-en">A nod to the sea in <i>Evangelion</i>.</span><span class="l-fr">Un clin d'œil à la mer d'<i>Evangelion</i>.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4d5ac73766.jpg" aria-label="Height displacement"><source src="media/4d5ac73766.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">With relief</span><span class="l-fr">Avec relief</span></b><span class="l-en">Optional height displacement gives the wave some relief.</span><span class="l-fr">En option, un déplacement en hauteur donne du relief à la vague.</span></figcaption></figure></div>
+    </div></div><div class="gallery g2 big"><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/a069b55946.jpg" aria-label="Turquoise look"><source src="media/a069b55946.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Tropical sea</span><span class="l-fr">Mer tropicale</span></b><span class="l-en">Turquoise gradient water, obtained through settings only.</span><span class="l-fr">Eau turquoise en dégradé, obtenue uniquement par les réglages.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4608fa0e4c.jpg" aria-label="Red sea look"><source src="media/4608fa0e4c.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Red sea</span><span class="l-fr">Mer rouge</span></b><span class="l-en">A nod to the sea in <i>Evangelion</i>.</span><span class="l-fr">Un clin d'œil à la mer d'<i>Evangelion</i>.</span></figcaption></figure></div><div class="gallery g2"><figure class="shot"><div class="vbox"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/d659c91150.jpg" aria-label="Debug view of fronts A, B, C"><source src="media/d659c91150.mp4" type="video/mp4"></video><img class="legend-inset" src="media/30fc14f070.webp" alt="A magenta, B cyan, C yellow"></div><figcaption><b><span class="l-en">Three waves</span><span class="l-fr">Trois vagues</span></b><span class="l-en">Debug view: each color is one wave.</span><span class="l-fr">Vue de debug : chaque couleur est une vague.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4d5ac73766.jpg" aria-label="Height displacement"><source src="media/4d5ac73766.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">With relief</span><span class="l-fr">Avec relief</span></b><span class="l-en">Optional height displacement gives the wave some relief.</span><span class="l-fr">En option, un déplacement en hauteur donne du relief à la vague.</span></figcaption></figure></div><figure class="shot demo-fig"><video autoplay loop muted playsinline preload="metadata" poster="media/demo_x8c.jpg" aria-label="Shader controls demo in Maya, 8x speed"><source src="media/demo_x8c.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">In Maya</span><span class="l-fr">Dans Maya</span></b><span class="l-en">The tool's settings, edited on its control node while the render updates.</span><span class="l-fr">Les réglages de l'outil, modifiés sur son nœud de contrôle pendant que le rendu se met à jour.</span></figcaption></figure>
   </div>
 </section>
 
@@ -343,7 +343,7 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
       </div>
       <div class="ae" id="pg-panel" aria-label="Settings panel"></div>
     </div>
-  <figure class="shot demo-fig"><video autoplay loop muted playsinline preload="metadata" poster="media/demo_x8c.jpg" aria-label="Shader controls demo in Maya, 8x speed"><source src="media/demo_x8c.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">In Maya</span><span class="l-fr">Dans Maya</span></b><span class="l-en">The same settings on the tool's control node, with the render updating (video sped up 8×).</span><span class="l-fr">Les mêmes réglages sur le nœud de contrôle de l'outil, avec le rendu qui se met à jour (vidéo accélérée ×8).</span></figcaption></figure>
+  
   </div>
 </section>
 
@@ -416,10 +416,6 @@ Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">
       <div class="num"><b>50+</b><span><span class="l-en">settings, gathered in a single panel for artists</span><span class="l-fr">réglages, regroupés dans un seul panneau pour les artistes</span></span></div>
       <div class="num"><b>0</b><span><span class="l-en">simulation to precompute: any frame can be reached directly</span><span class="l-fr">simulation à précalculer : chaque image est accessible directement</span></span></div>
     </div>
-    <figure class="network">
-      <img src="media/hypershade_overview.webp" alt="Overview of the node network in Maya's Hypershade" loading="lazy">
-      <figcaption><b><span class="l-en">The ~350 nodes, seen from afar</span><span class="l-fr">Les ~350 nœuds, vus de loin</span></b><span class="l-en">Each rectangle is an operation (noise, gradient, color mix). Their connections form the shader, a visual equivalent of code.</span><span class="l-fr">Chaque rectangle est une opération (bruit, dégradé, mélange de couleurs). Leurs connexions forment le shader, l'équivalent visuel du code.</span></figcaption>
-    </figure>
   </div>
 </section>
 
@@ -874,36 +870,52 @@ window.OlmSea = (function(){
   addEventListener('resize',function(){ apply(cur); });
 })();
 </script>
+<style>.hvs img.vfb{opacity:0;transition:opacity 1.2s ease}.hvs img.vfb.on{opacity:1}</style>
 <script>
 (function(){
-  // Safari / WebKit: load each video as a local blob (works even if the host refuses byte-range requests
-  // or sends the wrong content type), then play it when visible. Also start videos on the first interaction.
-  var ua=navigator.userAgent, WK=/AppleWebKit/.test(ua)&&!/Chrome\/|Chromium|Edg\/|Android|Firefox\//.test(ua);
+  // Video fallback. Some browsers (Safari, Brave) show only the first frame of the MP4s on these pages.
+  // Each video gets ~2.5 s after it becomes visible; if it has not started playing by then,
+  // it is replaced by the same animation as an animated WebP image (media/<name>_a.webp),
+  // which every current browser plays without any autoplay rule.
   var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function vis(v){ var r=v.getBoundingClientRect(); return r.width>0&&r.bottom>0&&r.top<innerHeight; }
-  function go(v){ if(reduce||!v.paused||!vis(v)) return; v.muted=true; v.setAttribute('playsinline',''); var p=v.play(); if(p&&p.catch)p.catch(function(){}); }
-  function blobify(v){
-    if(v.__bl) return; var s=v.querySelector('source');
-    var u=s?(s.getAttribute('src')||s.getAttribute('data-src')):(v.getAttribute('data-src')||v.getAttribute('src'));
-    if(!u||/^blob:/.test(u)) return; v.__bl=1;
-    fetch(u).then(function(r){ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(function(buf){
-      var bu=URL.createObjectURL(new Blob([buf],{type:'video/mp4'}));
-      v.muted=true; v.setAttribute('playsinline','');
-      if(s){ if(s.hasAttribute('data-src')) s.setAttribute('data-src',bu); s.setAttribute('src',bu); v.load(); }
-      else { if(v.hasAttribute('data-src')) v.setAttribute('data-src',bu); v.src=bu; }
-      go(v);
-    }).catch(function(){ v.__bl=0; });
+  if(reduce||!('IntersectionObserver' in window)) return;
+  var COPY=['position','left','top','right','bottom','objectFit','objectPosition','borderRadius','display','boxShadow','backgroundColor','zIndex','transform','transformOrigin','maxWidth','maxHeight','verticalAlign'];
+  function url(v){ var s=v.querySelector('source'); return (s&&(s.getAttribute('src')||s.getAttribute('data-src')))||v.getAttribute('src')||v.getAttribute('data-src')||''; }
+  function playing(v){ return !v.paused&&v.currentTime>0.05&&v.readyState>=2; }
+  function swap(v){
+    if(v.__fb||playing(v)) return; var u=url(v); if(!/\.mp4(\?|$)/.test(u)) return; v.__fb=1;
+    var cs=getComputedStyle(v), r=v.getBoundingClientRect(), p=v.parentElement, pr=p.getBoundingClientRect();
+    var img=new Image(); img.decoding='async'; img.alt=v.getAttribute('aria-label')||'';
+    img.className=(v.getAttribute('class')||'')+' vfb'; img.setAttribute('style',v.getAttribute('style')||'');
+    COPY.forEach(function(k){ if(!v.style[k]) img.style[k]=cs[k]; });
+    if(!v.style.width) img.style.width=(Math.abs(r.width-pr.width)<2)?'100%':(r.width+'px');
+    if(!v.style.height){ if(cs.position==='absolute'||cs.objectFit!=='fill'&&cs.aspectRatio==='auto') img.style.height=(cs.position==='absolute'&&Math.abs(r.height-pr.height)<2)?'100%':(r.height+'px'); else img.style.height='auto'; }
+    if(cs.aspectRatio&&cs.aspectRatio!=='auto') img.style.aspectRatio=cs.aspectRatio;
+    if(cs.objectFit==='fill') img.style.objectFit='contain';
+    img.onload=function(){ v.style.display='none'; try{ v.pause(); }catch(e){} };
+    img.onerror=function(){ img.remove(); };
+    img.src=u.replace(/\.mp4(\?.*)?$/,'_a.webp');
+    p.insertBefore(img,v);
+    v.__img=img;
+    // keep classes in sync (e.g. the cross-fading hero)
+    new MutationObserver(function(){ img.className=(v.getAttribute('class')||'')+' vfb'; }).observe(v,{attributes:true,attributeFilter:['class']});
   }
-  if(WK&&'IntersectionObserver' in window&&window.fetch&&window.URL&&URL.createObjectURL){
-    var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) blobify(e.target); }); },{rootMargin:'400px 0px'});
-    function scan(){ [].forEach.call(document.querySelectorAll('video'),function(v){ if(!v.__io){ v.__io=1; io.observe(v); } }); }
-    scan(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',scan);
-  }
-  var t=0;
-  function kick(){ if(t) return; t=setTimeout(function(){t=0;},400); [].forEach.call(document.querySelectorAll('video'),function(v){ if(v.currentSrc||v.querySelector('source[src]')) go(v); }); }
-  ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){ addEventListener(ev,kick,{passive:true}); });
+  var timers=new WeakMap();
+  var io=new IntersectionObserver(function(es){ es.forEach(function(e){
+    var v=e.target;
+    if(e.isIntersecting){ if(!timers.get(v)) timers.set(v,setTimeout(function(){ timers.delete(v); var r=v.getBoundingClientRect(); if(r.width>0) swap(v); },3000)); }
+    else { clearTimeout(timers.get(v)); timers.delete(v); }
+  }); },{threshold:0.15});
+  function scan(){ [].forEach.call(document.querySelectorAll('video'),function(v){ if(!v.__io){ v.__io=1; io.observe(v); } }); }
+  scan(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',scan);
+  // try once more to start everything on the first interaction
+  var once=false;
+  function kick(){ if(once) return; once=true; [].forEach.call(document.querySelectorAll('video'),function(v){ if(v.paused&&!v.__fb){ v.muted=true; var p=v.play(); if(p&&p.catch)p.catch(function(){}); } }); }
+  ['pointerdown','touchstart','keydown'].forEach(function(ev){ addEventListener(ev,kick,{passive:true}); });
 })();
 </script>
+
+
 
 <script>
 (function(){
