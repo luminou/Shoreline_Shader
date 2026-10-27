@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Shoreline Shader</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one long beach — navy "sea" hero with a live wave, then sand-colored and foam-colored bands that alternate like the tide line */
+:root{
+  --paper:#f3f5f8; --ink:#131d3b; --muted:#56627d; --line:#d5dbe5; --panel:#ffffff;
+  --water:#22357a; --water-deep:#18265a; --foam:#ffffff; --sand:#b8a786; --sand-soft:#e9e1cf; --sand-ink:#6b5b3b;
+  --accent:#2747a8; --a:#e0359a; --b:#1aa9c9; --c:#e3b505;
+  --code-bg:#0f1838; --code-ink:#dfe6f6;
+  --f-display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Arial Rounded MT Bold",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0b1330; --ink:#e7ecf6; --muted:#9ba8c4; --line:#26335c; --panel:#111c42;
+  --sand-soft:#2a2618; --sand-ink:#e2d3ac; --accent:#9cb7ff; --code-bg:#070d24; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0b1330; --ink:#e7ecf6; --muted:#9ba8c4; --line:#26335c; --panel:#111c42;
+  --sand-soft:#2a2618; --sand-ink:#e2d3ac; --accent:#9cb7ff; --code-bg:#070d24; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font:400 17px/1.65 var(--f-body)}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.band{padding-block:72px}
+.band.sand{background:var(--sand-soft)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance}
+h2{font-weight:900;font-size:clamp(28px,4.4vw,44px);line-height:1.08;margin:0 0 16px}
+h3{font-weight:700;font-size:20px;line-height:1.25;margin:0 0 6px}
+.kicker{font:600 12px/1.4 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+p{max-width:64ch;text-wrap:pretty;margin:0 0 14px}
+.lead{font-size:clamp(18px,2.1vw,21px);line-height:1.55}
+
+/* hero */
+.hero{background:var(--water);color:#fff;padding-block:56px 0;position:relative;overflow:hidden}
+.hero .kicker{color:#b9c8f2}
+.hero h1{font-weight:900;font-size:clamp(42px,7.5vw,84px);line-height:.98;margin:0 0 18px;letter-spacing:-.01em}
+.hero h1 span{color:#c9e3ff}
+.hero .lead{color:#e3e9f9;max-width:36em}
+.hero-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:44px;align-items:end}
+.live{margin:0;position:relative}
+.live canvas{display:block;width:100%;aspect-ratio:16/10;border-radius:8px 8px 0 0;background:#9e9784}
+.live figcaption{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 12.5px/1.4 var(--f-mono);color:#c6d1ee;padding:12px 0 18px}
+.live button{font:600 12px/1 var(--f-mono);color:#fff;background:transparent;border:1px solid rgba(255,255,255,.35);border-radius:99px;padding:7px 12px;cursor:pointer}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0 40px;padding:0;list-style:none;font-size:14px;color:#dbe3f7}
+.legend li{display:flex;align-items:center;gap:7px}
+.dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+.shore{height:28px;background:var(--sand)}
+
+/* intro */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:start}
+.quote{border-left:3px solid var(--sand);padding:4px 0 4px 18px;font-family:var(--f-display);font-size:21px;line-height:1.45;font-weight:700;margin:6px 0 0}
+.quote small{display:block;font:400 14px/1.5 var(--f-body);color:var(--muted);margin-top:10px}
+
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:30px}
+.shot{margin:0;display:grid;gap:10px;align-content:start}
+.shot video,.shot img{width:100%;height:auto;display:block;border-radius:6px;background:var(--panel);box-shadow:0 0 0 1px var(--line)}
+.shot figcaption{font-size:15px;line-height:1.5;color:var(--muted)}
+.shot figcaption b{display:block;color:var(--ink);font-family:var(--f-display);font-size:17px;margin-bottom:2px}
+.shot.wide{grid-column:span 2}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pair span{font:500 11.5px/1.3 var(--f-mono);color:var(--muted)}
+
+/* timeline */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin:30px 0 0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:grid;gap:10px;align-content:start}
+.steps video,.steps img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:6px;display:block;box-shadow:0 0 0 1px var(--line);background:var(--panel)}
+.steps .when{font:600 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--sand-ink)}
+.steps p{font-size:15px;line-height:1.5;margin:0;color:var(--muted)}
+.strip{margin:28px 0 0}
+.strip img{width:100%;display:block;border-radius:6px;box-shadow:0 0 0 1px var(--line)}
+.strip figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+
+/* formula */
+.math{display:grid;gap:14px;margin:22px 0 26px}
+.eq{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center;padding:16px 18px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.eq .tex{font-size:22px;overflow-x:auto;color:var(--ink)}
+.eq .tex math{font-size:1.15em}
+.eq p{margin:0;font-size:15.5px;color:var(--muted)}
+.eq p b{color:var(--ink)}
+.play{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:28px;align-items:center;margin-top:20px;padding:22px;border-radius:10px;background:var(--panel);border:1px solid var(--line)}
+.play svg{width:100%;height:auto;display:block}
+.ctrl{display:grid;gap:18px}
+.ctrl label{display:grid;gap:6px;font-size:14.5px}
+.ctrl label span{display:flex;justify-content:space-between;font-weight:600}
+.ctrl output{font:600 13px/1 var(--f-mono);color:var(--accent)}
+.ctrl input[type=range]{width:100%;accent-color:var(--accent)}
+.ctrl .hint{font-size:14px;color:var(--muted);margin:0}
+
+/* code */
+.codegrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:30px;align-items:start;margin-top:22px}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:8px;padding:18px 18px;overflow-x:auto;font:400 13.5px/1.7 var(--f-mono)}
+pre.code .c{color:#7f8db6;font-style:italic}
+pre.code .k{color:#ffcf8a}
+pre.code .v{color:#c9b6ff}
+pre.code .n{color:#9fe0ff}
+pre.code mark{background:rgba(255,207,138,.16);color:inherit;border-radius:3px;padding:0 2px}
+.notes{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.notes li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;font-size:15.5px;line-height:1.5}
+.notes li i{font:600 12px/26px var(--f-mono);font-style:normal;width:26px;height:26px;border-radius:50%;text-align:center;background:var(--water);color:#fff}
+
+/* numbers */
+.nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;margin:26px 0 0}
+.num{border-top:2px solid var(--ink);padding-top:12px}
+.num b{display:block;font:900 clamp(34px,5vw,52px)/1 var(--f-display);font-variant-numeric:tabular-nums}
+.num span{font-size:14.5px;color:var(--muted);line-height:1.45;display:block;margin-top:6px}
+/* comparisons + network */
+.compare{margin-top:44px}
+.cmp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:14px}
+.network{margin:34px 0 0;display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:28px;align-items:center}
+.network img{width:100%;border-radius:6px;display:block;box-shadow:0 0 0 1px var(--line);background:#2b2b2b}
+.network figcaption{font-size:16px;color:var(--muted);max-width:52ch}
+.network figcaption b{display:block;color:var(--ink);font-family:var(--f-display);font-size:19px;margin-bottom:4px}
+@media (max-width:900px){.cmp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.network{grid-template-columns:minmax(0,1fr)}.network img{max-width:260px}}
+footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+
+@media (prefers-reduced-motion:no-preference){
+  .hero h1,.hero .lead,.live{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+  .hero .lead{animation-delay:.08s}.live{animation-delay:.15s}
+}
+@keyframes rise{from{transform:translateY(16px)}to{transform:none}}
+@media (max-width:900px){
+  .hero-grid,.two,.play,.codegrid,.eq{grid-template-columns:minmax(0,1fr)}
+  .gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps,.nums{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .legend{margin-bottom:22px}
+}
+@media (max-width:560px){
+  .gallery{grid-template-columns:minmax(0,1fr)}
+  .shot.wide{grid-column:auto}
+  .band{padding-block:52px}
+  body{font-size:16.5px}
+}
+/* playground: Attribute-Editor-like panel */
+.play-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:1.8cqw;min-height:0}
+.play-stage{display:grid;grid-template-rows:minmax(0,1fr) auto;gap:.8cqw;min-height:0}
+.play-stage canvas{width:100%;height:100%;object-fit:cover;display:block;border-radius:.35cqw;background:#9e9784;min-height:0}
+.play-bar{display:flex;gap:.8cqw;align-items:center;flex-wrap:wrap}
+.ae{background:#3a3a3a;color:#e6e6e6;border-radius:.35cqw;overflow:auto;min-height:0;font:400 max(11px,.82cqw)/1.3 "IBM Plex Sans",system-ui,sans-serif;border:1px solid #222;box-shadow:inset 0 1px 0 #4a4a4a}
+.ae-top{position:sticky;top:0;z-index:1;background:#3a3a3a;padding:8px;display:grid;gap:6px;border-bottom:1px solid #2a2a2a}
+.ae-btn{font:600 max(11px,.8cqw)/1 inherit;font-family:inherit;color:#eee;background:#5d5d5d;border:1px solid #2b2b2b;border-radius:3px;padding:7px 8px;cursor:pointer}
+.ae-btn:hover{background:#6a6a6a}
+.ae-presets{display:flex;flex-wrap:wrap;gap:5px}
+.ae-chip{font:500 max(10.5px,.75cqw)/1 inherit;font-family:inherit;color:#dfe8ff;background:#2b3a66;border:1px solid #445a99;border-radius:99px;padding:5px 9px;cursor:pointer}
+.ae-chip:hover{background:#38508c}
+.ae-group{border-bottom:1px solid #2a2a2a}
+.ae-group summary{cursor:pointer;background:#4b4b4b;padding:5px 8px;font-weight:600;list-style:none}
+.ae-group summary::before{content:"▸ ";color:#bbb}
+.ae-group[open] summary::before{content:"▾ "}
+.ae-group summary::-webkit-details-marker{display:none}
+.ae-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:6px;align-items:center;padding:3px 8px}
+.ae-row label{text-align:right;color:#cfcfcf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ae-ctl{display:flex;gap:6px;align-items:center;min-width:0}
+.ae-ctl output{flex:0 0 auto;min-width:4.2em;background:#2b2b2b;border:1px solid #222;padding:2px 4px;font:500 max(10.5px,.75cqw)/1.2 "JetBrains Mono",monospace;color:#fff;text-align:right}
+.ae-ctl input[type=range]{flex:1;min-width:0;accent-color:#9fb4e8}
+.ae-ctl input[type=color]{width:100%;height:20px;border:1px solid #222;background:none;padding:0}
+.ae-ctl select{width:100%;background:#2b2b2b;color:#eee;border:1px solid #222;font:inherit;padding:2px}
+.ae-row.off{opacity:.4}
+@media (max-width:760px){.play-grid{grid-template-columns:minmax(0,1fr)}.play-stage canvas{aspect-ratio:16/10;height:auto}.ae{max-height:520px}}
+
+.fam{margin-top:24px}
+.fam .play-stage{grid-template-rows:auto auto;align-content:start}
+.fam .play-stage canvas{aspect-ratio:16/9;height:auto}
+.fam .ae{max-height:560px}
+.hint-s{font-size:14px;color:var(--muted)}
+
+.fx{display:grid;gap:.7em}
+.fx-line{font-family:"Cambria Math","STIX Two Math","Latin Modern Math","Times New Roman",serif;font-size:clamp(18px,2.4vw,26px);line-height:1.6;display:flex;flex-wrap:wrap;align-items:center;gap:.12em .22em;padding:.55em .7em;border-radius:.3em;border:1px solid var(--fx-line,rgba(127,127,127,.3));background:var(--fx-bg,rgba(127,127,127,.06));overflow-x:auto}
+.fx-sup{font-size:.62em;align-self:flex-start;margin:.05em .05em 0 0}
+.fx-u{font-style:italic;margin-right:.1em}
+.fx-o{padding:0 .12em}
+.fx-b{font-size:1.2em;line-height:1;padding:0 .04em;opacity:.85}
+.fx-p{display:inline-flex;align-items:center;border-radius:.25em;padding:0 .12em;cursor:pointer;transition:background .2s,box-shadow .2s;border-bottom:2px solid var(--k);outline:none}
+.fx-p:focus-visible{box-shadow:0 0 0 2px var(--k)}
+.fx-p .fx-p{margin:0 .05em}
+.fx-frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-size:.82em;line-height:1.25;margin:0 .1em}
+.fx-frac>span:first-child{border-bottom:1px solid currentColor;padding:0 .2em}
+.fx-frac>span:last-child{padding:0 .2em}
+.fx-t{margin:0;font-size:15px;opacity:.75}
+.fx-chips{display:flex;flex-wrap:wrap;gap:.4em}
+.fx-chip{font:600 15px/1 inherit;font-family:inherit;color:inherit;background:transparent;border:1px solid var(--k);border-left-width:.5em;border-radius:99px;padding:.45em .75em;cursor:pointer}
+.fx-info{margin:0;min-height:3.2em;font-size:15px;line-height:1.45}
+.fx-info b{display:block}
+.fx .fx-p[data-k="start"]{--k:#ff8a5b}.fx .fx-p[data-k="scale"]{--k:#ffc145}.fx .fx-p[data-k="norm"]{--k:#5ec8f2}.fx .fx-p[data-k="ease"]{--k:#7d8cff}.fx .fx-p[data-k="amount"]{--k:#ff5fa2}.fx .fx-p[data-k="smooth"]{--k:#4fd1a5}.fx .fx-p[data-k="progress"]{--k:#c38bff}.fx[data-hl="start"] .fx-p[data-k="start"]{background:color-mix(in srgb,#ff8a5b 32%,transparent);box-shadow:0 0 0 2px #ff8a5b;}.fx[data-hl="start"] .fx-chip[data-k="start"]{background:#ff8a5b;color:#111;border-color:#ff8a5b}.fx[data-hl="scale"] .fx-p[data-k="scale"]{background:color-mix(in srgb,#ffc145 32%,transparent);box-shadow:0 0 0 2px #ffc145;}.fx[data-hl="scale"] .fx-chip[data-k="scale"]{background:#ffc145;color:#111;border-color:#ffc145}.fx[data-hl="norm"] .fx-p[data-k="norm"]{background:color-mix(in srgb,#5ec8f2 32%,transparent);box-shadow:0 0 0 2px #5ec8f2;}.fx[data-hl="norm"] .fx-chip[data-k="norm"]{background:#5ec8f2;color:#111;border-color:#5ec8f2}.fx[data-hl="ease"] .fx-p[data-k="ease"]{background:color-mix(in srgb,#7d8cff 32%,transparent);box-shadow:0 0 0 2px #7d8cff;}.fx[data-hl="ease"] .fx-chip[data-k="ease"]{background:#7d8cff;color:#111;border-color:#7d8cff}.fx[data-hl="amount"] .fx-p[data-k="amount"]{background:color-mix(in srgb,#ff5fa2 32%,transparent);box-shadow:0 0 0 2px #ff5fa2;}.fx[data-hl="amount"] .fx-chip[data-k="amount"]{background:#ff5fa2;color:#111;border-color:#ff5fa2}.fx[data-hl="smooth"] .fx-p[data-k="smooth"]{background:color-mix(in srgb,#4fd1a5 32%,transparent);box-shadow:0 0 0 2px #4fd1a5;}.fx[data-hl="smooth"] .fx-chip[data-k="smooth"]{background:#4fd1a5;color:#111;border-color:#4fd1a5}.fx[data-hl="progress"] .fx-p[data-k="progress"]{background:color-mix(in srgb,#c38bff 32%,transparent);box-shadow:0 0 0 2px #c38bff;}.fx[data-hl="progress"] .fx-chip[data-k="progress"]{background:#c38bff;color:#111;border-color:#c38bff}
+.fx{margin:22px 0 6px}
+.fx-line{--fx-bg:var(--panel);--fx-line:var(--line)}
+
+.recipe{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:40px;align-items:center;margin-top:48px}
+.recipe-hint{font-size:14px;color:var(--muted)}
+.stk{position:relative;width:100%;max-width:360px;margin:20px 120px 20px auto;aspect-ratio:678/1271;touch-action:pan-y}
+.stk .pl{position:absolute;left:0;width:100%;height:36.743%;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none;
+  transform:translateY(var(--dy,0px)) scale(var(--s,1));transform-origin:50% 55%;transition:transform .6s cubic-bezier(.34,1.56,.64,1),filter .35s ease;
+  filter:drop-shadow(0 6px 6px rgba(19,29,59,.18))}
+.stk .pl.on{z-index:30!important;filter:drop-shadow(0 22px 22px rgba(19,29,59,.45)) brightness(1.06)}
+.ltag{position:absolute;left:100%;margin-left:28px;z-index:40;transform:translateY(-50%) scale(.6);opacity:0;font:700 15px/1 var(--f-body);background:var(--water);color:#fff;padding:9px 14px;border-radius:99px;box-shadow:0 8px 18px -8px rgba(0,0,0,.5);pointer-events:none;white-space:nowrap;transition:transform .5s cubic-bezier(.34,1.8,.5,1),opacity .2s,top .5s cubic-bezier(.34,1.3,.64,1)}
+.ltag.on{opacity:1;transform:translateY(-50%) scale(1)}
+@media (prefers-reduced-motion:reduce){.stk .pl,.ltag{transition:none}}
+@media (max-width:760px){.recipe{grid-template-columns:minmax(0,1fr)}.stk{max-width:250px;margin:20px auto 20px 10px}}
+
+:root:not([data-l="en"]) .l-en{display:none!important}
+:root[data-l="en"] .l-fr{display:none!important}
+.lang{display:inline-flex;gap:6px;align-items:center}
+.lang button{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 system-ui,sans-serif;letter-spacing:.06em;color:inherit;background:rgba(127,127,127,.12);border:1px solid rgba(127,127,127,.35);border-radius:99px;padding:5px 9px 5px 6px;cursor:pointer;opacity:.6}
+.lang button svg{width:20px;height:13px;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.lang button[aria-pressed="true"]{opacity:1;border-color:currentColor}
+
+.hero-top{display:flex;justify-content:flex-end;margin:-28px auto 18px}
+.hero .lang button{color:#fff}
+.vbox{position:relative}
+.vbox video{width:100%;height:auto;display:block;border-radius:6px;background:var(--panel);box-shadow:0 0 0 1px var(--line)}
+.shot .vbox img.legend-inset{position:absolute;width:12%!important;max-width:110px;min-width:34px;border:0!important;outline:0;background:#fff!important;padding:3px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.18)!important;}
+.legend-inset{position:absolute;top:8px;right:8px;width:12%;min-width:34px;height:auto;background:#fff;border-radius:6px;padding:3px;box-shadow:0 4px 10px rgba(0,0,0,.3)}
+.codegrid>div{min-width:0}
+</style>
+</head>
+<body>
+
+
+<header class="hero">
+  <div class="wrap hero-top"><div class="lang" role="group" aria-label="Language / Langue"><button type="button" data-set-l="fr" lang="fr" aria-label="Français"><svg viewBox="0 0 3 2" aria-hidden="true"><rect width="1" height="2" fill="#0055a4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ef4135"/></svg><span>FR</span></button><button type="button" data-set-l="en" lang="en" aria-label="English"><svg viewBox="0 0 60 30" aria-hidden="true"><clipPath id="uk-c"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#uk-c)" stroke="#C8102E" stroke-width="4"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg><span>EN</span></button></div></div>
+  <div class="wrap hero-grid">
+    <div>
+      <p class="kicker"><span class="l-en">R&amp;D internship · OLM Digital · April to October 2026</span><span class="l-fr">Stage R&amp;D · OLM Digital · avril à octobre 2026</span></p>
+      <h1><span class="l-en">Hand-drawn <span>waves</span>, computed</span><span class="l-fr">Des vagues <span>dessinées</span>, calculées</span></h1>
+      <p class="lead"><span class="l-en">Six months in the R&amp;D team of OLM Digital, the Japanese animation studio known for the Pokémon films, developing a procedural Maya shader that recreates hand-drawn anime water in 3D.</span><span class="l-fr">Six mois au sein de l'équipe R&amp;D d'OLM Digital, studio d'animation japonais connu pour les films Pokémon, à développer un shader procédural pour Maya qui reproduit en 3D l'eau dessinée à la main de l'animation japonaise.</span></p>
+      <ul class="legend">
+        <li><span class="dot" style="background:#fff"></span><span class="l-en">foam</span><span class="l-fr">écume</span></li>
+        <li><span class="dot" style="background:#22357a;box-shadow:0 0 0 1px #8ea2df"></span><span class="l-en">water</span><span class="l-fr">eau</span></li>
+        <li><span class="dot" style="background:#b8a786"></span><span class="l-en">sand</span><span class="l-fr">sable</span></li>
+        <li><span class="dot" style="background:#6f6a5c"></span><span class="l-en">wet sand</span><span class="l-fr">sable mouillé</span></li>
+      </ul>
+    </div>
+    <figure class="live">
+      <canvas id="sea" width="384" height="240" aria-label="Three waves reaching a beach, computed live"></canvas>
+      <figcaption><span><span class="l-en">Computed live in the browser with the same formula as the tool (simplified).</span><span class="l-fr">Calculé en direct dans le navigateur avec la même formule que l'outil (version simplifiée).</span></span><button type="button" id="pause">Pause</button></figcaption>
+    </figure>
+  </div>
+  <div class="shore" aria-hidden="true"></div>
+</header>
+
+<section class="band">
+  <div class="wrap">
+    <p class="kicker"><span class="l-en">The starting point</span><span class="l-fr">Le point de départ</span></p>
+    <h2><span class="l-en">In anime, every wave is drawn by hand</span><span class="l-fr">En animation, chaque vague est dessinée à la main</span></h2>
+    <p class="lead"><span class="l-en">In anime, the foam of a wave reaching the shore is drawn by hand, frame by frame, at 24 frames for every second of animation.</span><span class="l-fr">Dans un anime, l'écume d'une vague qui arrive sur la plage est dessinée à la main, image par image, à raison de 24 images pour chaque seconde d'animation.</span></p>
+    <p><span class="l-en">It looks great, but it is very slow. The goal: a tool that generates these waves automatically while keeping their hand-drawn look.</span><span class="l-fr">C'est beau, mais très long. L'objectif : un outil qui génère ces vagues automatiquement tout en conservant leur aspect dessiné.</span></p>
+    <p><span class="l-en">The main reference was <i>Pokémon: The Movie 2000</i> (Lugia, released in Japan in 1999), produced by OLM. The sea of <i>The End of Evangelion</i> was a second reference.</span><span class="l-fr">La référence principale était le film <i>Pokémon 2 : Le pouvoir est en toi</i> (Lugia, sorti au Japon en 1999), produit par OLM. La mer de <i>The End of Evangelion</i> a servi de seconde référence.</span></p>
+  </div>
+  <div class="wrap compare">
+    <h3><span class="l-en">The reference, then the tool</span><span class="l-fr">La référence, puis l'outil</span></h3>
+    <div class="cmp-grid">
+      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/d08172bb29.jpg" src="media/d08172bb29.mp4" aria-label="Pokémon reference"></video><figcaption><b><span class="l-en">Reference</span><span class="l-fr">Référence</span></b><span class="l-en">Pokémon (Lugia, 1999): hand-animated waves.</span><span class="l-fr">Pokémon (Lugia, 1999) : vagues animées à la main.</span></figcaption></figure>
+      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/b466276f61.jpg" src="media/b466276f61.mp4" aria-label="Default look"></video><figcaption><b><span class="l-en">The tool</span><span class="l-fr">L'outil</span></b><span class="l-en">Tool render, default settings.</span><span class="l-fr">Rendu de l'outil, réglages par défaut.</span></figcaption></figure>
+      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/8f78d8c398.jpg" src="media/8f78d8c398.mp4" aria-label="Evangelion reference"></video><figcaption><b><span class="l-en">Reference</span><span class="l-fr">Référence</span></b><span class="l-en"><i>The End of Evangelion</i> (1997) and its red sea.</span><span class="l-fr"><i>The End of Evangelion</i> (1997) et sa mer rouge.</span></figcaption></figure>
+      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/4608fa0e4c.jpg" src="media/4608fa0e4c.mp4" aria-label="Red sea look"></video><figcaption><b><span class="l-en">The tool</span><span class="l-fr">L'outil</span></b><span class="l-en">Same tool, different settings.</span><span class="l-fr">Le même outil, d'autres réglages.</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="band sand">
+  <div class="wrap">
+    <p class="kicker"><span class="l-en">The result</span><span class="l-fr">Le résultat</span></p>
+    <h2><span class="l-en">One tool, many seas</span><span class="l-fr">Un outil, de nombreuses mers</span></h2>
+    <p class="lead"><span class="l-en">Everything can be adjusted: wave speed, water color, the shape of the foam cells, splashes, how fast the sand dries.</span><span class="l-fr">Tout est réglable : vitesse des vagues, couleur de l'eau, forme des cellules d'écume, éclaboussures, séchage du sable.</span></p>
+    <div class="gallery">
+      <figure class="shot wide"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/b466276f61.jpg" src="media/b466276f61.mp4" aria-label="Final render"></video><figcaption><b><span class="l-en">Final render</span><span class="l-fr">Rendu final</span></b><span class="l-en">Three waves come in, appear as dashes, merge into a foam line, then pull back and leave wet sand behind.</span><span class="l-fr">Trois vagues arrivent, apparaissent en pointillés, forment une ligne d'écume, puis reculent en laissant le sable mouillé.</span></figcaption></figure>
+      <figure class="shot"><div class="vbox"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/d659c91150.jpg" src="media/d659c91150.mp4" aria-label="Debug view of fronts A, B, C"></video><img class="legend-inset" src="media/30fc14f070.webp" alt="A magenta, B cyan, C yellow"></div><figcaption><b><span class="l-en">Three waves</span><span class="l-fr">Trois vagues</span></b><span class="l-en">Debug view: each color is one wave (A magenta, B cyan, C yellow). They follow the same rules, offset in time, so the sea never looks like one repeating wave.</span><span class="l-fr">Vue de debug : chaque couleur est une vague (A magenta, B cyan, C jaune). Elles suivent les mêmes règles, décalées dans le temps, pour que la mer ne ressemble jamais à une seule vague qui se répète.</span></figcaption></figure>
+      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/a069b55946.jpg" src="media/a069b55946.mp4" aria-label="Turquoise look"></video><figcaption><b><span class="l-en">Tropical sea</span><span class="l-fr">Mer tropicale</span></b><span class="l-en">Turquoise gradient water, obtained through settings only.</span><span class="l-fr">Eau turquoise en dégradé, obtenue uniquement par les réglages.</span></figcaption></figure>
+      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/4608fa0e4c.jpg" src="media/4608fa0e4c.mp4" aria-label="Red sea look"></video><figcaption><b><span class="l-en">Red sea</span><span class="l-fr">Mer rouge</span></b><span class="l-en">A nod to the sea in <i>Evangelion</i>.</span><span class="l-fr">Un clin d'œil à la mer d'<i>Evangelion</i>.</span></figcaption></figure>
+      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/4d5ac73766.jpg" src="media/4d5ac73766.mp4" aria-label="Height displacement"></video><figcaption><b><span class="l-en">With relief</span><span class="l-fr">Avec relief</span></b><span class="l-en">Optional height displacement gives the wave some relief.</span><span class="l-fr">En option, un déplacement en hauteur donne du relief à la vague.</span></figcaption></figure>
+      <figure class="shot"><div class="pair"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/b466276f61.jpg" src="media/b466276f61.mp4" aria-label="Phase offset A 0.6, B 0.2, C 0"></video><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/e16c806568.jpg" src="media/e16c806568.mp4" aria-label="Phase offset A 0.4, B 0.5, C 0.3"></video></div><figcaption><b><span class="l-en">Phase offset</span><span class="l-fr">Décalage des vagues</span></b><span class="l-en">The same three waves, staggered differently in time.</span><span class="l-fr">Les trois mêmes vagues, échelonnées autrement dans le temps.</span></figcaption></figure>
+      <figure class="shot"><div class="pair"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/196bc9a43a.jpg" src="media/196bc9a43a.mp4" aria-label="Wet sand dries in 2 s"></video><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/9baa1ec524.jpg" src="media/9baa1ec524.mp4" aria-label="Wet sand dries in 5 s"></video><span><span class="l-en">dries in 2 s</span><span class="l-fr">sèche en 2 s</span></span><span><span class="l-en">dries in 5 s</span><span class="l-fr">sèche en 5 s</span></span></div><figcaption><b><span class="l-en">Wet sand</span><span class="l-fr">Sable mouillé</span></b><span class="l-en">The dark trace left by the water dries at the chosen speed.</span><span class="l-fr">La trace sombre laissée par l'eau sèche à la vitesse choisie.</span></figcaption></figure>
+    </div>
+    <div class="recipe">
+      <div class="recipe-txt">
+        <h3><span class="l-en">One image, seven layers</span><span class="l-fr">Une image, sept couches</span></h3>
+        <p><span class="l-en">The final image stacks seven layers, like layers in a painting program. Each has its own mask, which defines where it appears.</span><span class="l-fr">L'image finale superpose sept couches, comme des calques. Chacune a son propre masque, qui définit où elle apparaît.</span></p>
+        <p class="recipe-hint"><span class="l-en">Hover a layer to bring it forward.</span><span class="l-fr">Survolez une couche pour la faire ressortir.</span></p>
+      </div>
+      <div class="stk" id="stk" role="img" aria-label="Seven stacked layers"><img class="pl" data-i="0" src="media/layer_sand.webp" alt="" style="top:63.257%;z-index:1" draggable="false"><img class="pl" data-i="1" src="media/layer_wet.webp" alt="" style="top:52.714%;z-index:2" draggable="false"><img class="pl" data-i="2" src="media/layer_water.webp" alt="" style="top:42.172%;z-index:3" draggable="false"><img class="pl" data-i="3" src="media/layer_veins.webp" alt="" style="top:31.629%;z-index:4" draggable="false"><img class="pl" data-i="4" src="media/layer_shadow.webp" alt="" style="top:21.086%;z-index:5" draggable="false"><img class="pl" data-i="5" src="media/layer_foam.webp" alt="" style="top:10.543%;z-index:6" draggable="false"><img class="pl" data-i="6" src="media/layer_splash.webp" alt="" style="top:0.000%;z-index:7" draggable="false">
+        <span class="ltag" id="ltag"></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <p class="kicker"><span class="l-en">Six months of tests</span><span class="l-fr">Six mois d'essais</span></p>
+    <h2><span class="l-en">From first tests to the final tool</span><span class="l-fr">Des premiers tests à l'outil final</span></h2>
+    <p class="lead"><span class="l-en">The first approach relied on a physical simulation of the sea. It was later replaced by a fully procedural system driven by formulas.</span><span class="l-fr">La première approche reposait sur une simulation physique de la mer. Elle a ensuite été remplacée par un système entièrement procédural, piloté par des formules.</span></p>
+    <ol class="steps">
+      <li><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/b352206789.jpg" src="media/b352206789.mp4" aria-label="First deformation test"></video><span class="when"><span class="l-en">April</span><span class="l-fr">Avril</span></span><p><span class="l-en">First tests in Bifrost: a rippled surface and foam spots.</span><span class="l-fr">Premiers tests dans Bifrost : surface ondulée et taches d'écume.</span></p></li>
+      <li><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/76c33f80b8.jpg" src="media/76c33f80b8.mp4" aria-label="Swell simulation"></video><span class="when"><span class="l-en">May</span><span class="l-fr">Mai</span></span><p><span class="l-en">A BOSS swell simulation, overlaid with a cellular pattern.</span><span class="l-fr">Simulation de houle avec BOSS, recouverte d'un motif cellulaire.</span></p></li>
+      <li><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/d0b16d6fdd.jpg" src="media/d0b16d6fdd.mp4" aria-label="Three wave lines"></video><span class="when"><span class="l-en">June</span><span class="l-fr">Juin</span></span><p><span class="l-en">The turning point: three wave fronts driven by a formula.</span><span class="l-fr">Le tournant : trois fronts de vagues pilotés par une formule.</span></p></li>
+      <li><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/b466276f61.jpg" src="media/b466276f61.mp4" aria-label="Final render"></video><span class="when"><span class="l-en">September</span><span class="l-fr">Septembre</span></span><p><span class="l-en">The final tool and its manual, presented to the studio's teams.</span><span class="l-fr">L'outil final et son manuel, présentés aux équipes du studio.</span></p></li>
+    </ol>
+    <figure class="strip">
+      <img src="media/cells_strip.webp" alt="Foam cell pattern iterations" loading="lazy">
+      <figcaption><span class="l-en">The foam cell pattern, from the first version (left) to the final one (right).</span><span class="l-fr">Le motif des cellules d'écume, de la première version (à gauche) à la version finale (à droite).</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="band sand">
+  <div class="wrap">
+    <p class="kicker"><span class="l-en">The formula</span><span class="l-fr">La formule</span></p>
+    <h2><span class="l-en">A wave described by a curve</span><span class="l-fr">Une vague décrite par une courbe</span></h2>
+    <p class="lead"><span class="l-en">No simulation: the position of each wave is computed from the animation time, so any frame can be rendered directly, with a consistent result.</span><span class="l-fr">Aucune simulation : la position de chaque vague est calculée à partir du temps de l'animation. Chaque image peut être rendue directement, avec un résultat toujours identique.</span></p>
+    <div class="l-en"><div class="fx" id="fx-en" data-lang="en">
+  <div class="fx-line" aria-label="Wave position formula"><span class="fx-u">U(t)</span><span class="fx-o">=</span><span class="fx-p" data-k="start" tabindex="0" role="button" aria-label="Start position">1.5</span><span class="fx-o">−</span><span class="fx-p" data-k="scale" tabindex="0" role="button" aria-label="Scale to the plane">1.4</span><span class="fx-o">×</span><span class="fx-p" data-k="ease" tabindex="0" role="button" aria-label="Ease-out"><span class="fx-b">[</span>1 − <span class="fx-b">(</span>1 − <span class="fx-p" data-k="norm" tabindex="0" role="button" aria-label="Normalized advance"><span class="fx-frac"><span>min(t,&nbsp;0.6)</span><span>0.6</span></span></span><span class="fx-b">)</span><span class="fx-sup">2</span><span class="fx-b">]</span></span><span class="fx-o">+</span><span class="fx-p" data-k="amount" tabindex="0" role="button" aria-label="Recede Amount">Recede Amount</span><span class="fx-o">×</span><span class="fx-p" data-k="smooth" tabindex="0" role="button" aria-label="Smoothstep">S<span class="fx-b">(</span><span class="fx-p" data-k="progress" tabindex="0" role="button" aria-label="Recede progress">max<span class="fx-b">(</span>0,&nbsp;<span class="fx-frac"><span>t − Recede Start</span><span>1 − Recede Start</span></span><span class="fx-b">)</span></span><span class="fx-b">)</span></span></div>
+  <p class="fx-t">with t = fraction of the cycle = frac(time / Wave Cycle Duration + Phase Offset)</p>
+  <div class="fx-chips"><button type="button" class="fx-chip" data-k="start" style="--k:#ff8a5b">Start position</button><button type="button" class="fx-chip" data-k="scale" style="--k:#ffc145">Scale to the plane</button><button type="button" class="fx-chip" data-k="norm" style="--k:#5ec8f2">Normalized advance</button><button type="button" class="fx-chip" data-k="ease" style="--k:#7d8cff">Ease-out</button><button type="button" class="fx-chip" data-k="amount" style="--k:#ff5fa2">Recede Amount</button><button type="button" class="fx-chip" data-k="smooth" style="--k:#4fd1a5">Smoothstep</button><button type="button" class="fx-chip" data-k="progress" style="--k:#c38bff">Recede progress</button></div>
+  <p class="fx-info" id="fx-info-en" aria-live="polite"><b>Hover or tap a part of the formula.</b></p>
+</div></div><div class="l-fr"><div class="fx" id="fx-fr" data-lang="fr">
+  <div class="fx-line" aria-label="Wave position formula"><span class="fx-u">U(t)</span><span class="fx-o">=</span><span class="fx-p" data-k="start" tabindex="0" role="button" aria-label="Position de départ">1.5</span><span class="fx-o">−</span><span class="fx-p" data-k="scale" tabindex="0" role="button" aria-label="Mise à l'échelle">1.4</span><span class="fx-o">×</span><span class="fx-p" data-k="ease" tabindex="0" role="button" aria-label="Ralentissement"><span class="fx-b">[</span>1 − <span class="fx-b">(</span>1 − <span class="fx-p" data-k="norm" tabindex="0" role="button" aria-label="Avancée normalisée"><span class="fx-frac"><span>min(t,&nbsp;0.6)</span><span>0.6</span></span></span><span class="fx-b">)</span><span class="fx-sup">2</span><span class="fx-b">]</span></span><span class="fx-o">+</span><span class="fx-p" data-k="amount" tabindex="0" role="button" aria-label="Amplitude du recul">R</span><span class="fx-o">×</span><span class="fx-p" data-k="smooth" tabindex="0" role="button" aria-label="Smoothstep">S<span class="fx-b">(</span><span class="fx-p" data-k="progress" tabindex="0" role="button" aria-label="Progression du recul">max<span class="fx-b">(</span>0,&nbsp;<span class="fx-frac"><span>t − tᵣ</span><span>1 − tᵣ</span></span><span class="fx-b">)</span></span><span class="fx-b">)</span></span></div>
+  <p class="fx-t">avec t = fraction du cycle = partie décimale de (temps / durée du cycle + décalage de la vague)</p>
+  <div class="fx-chips"><button type="button" class="fx-chip" data-k="start" style="--k:#ff8a5b">Position de départ</button><button type="button" class="fx-chip" data-k="scale" style="--k:#ffc145">Mise à l'échelle</button><button type="button" class="fx-chip" data-k="norm" style="--k:#5ec8f2">Avancée normalisée</button><button type="button" class="fx-chip" data-k="ease" style="--k:#7d8cff">Ralentissement</button><button type="button" class="fx-chip" data-k="amount" style="--k:#ff5fa2">Amplitude du recul</button><button type="button" class="fx-chip" data-k="smooth" style="--k:#4fd1a5">Smoothstep</button><button type="button" class="fx-chip" data-k="progress" style="--k:#c38bff">Progression du recul</button></div>
+  <p class="fx-info" id="fx-info-fr" aria-live="polite"><b>Survolez ou touchez une partie de la formule.</b></p>
+</div></div>
+    <div class="play">
+      <svg id="plot" viewBox="0 0 600 316" role="img" aria-label="Wave position over one cycle"></svg>
+      <div class="ctrl">
+        <label for="rs"><span><span class="l-en">Recede Start t<sub>r</sub></span><span class="l-fr">Début du recul t<sub>r</sub></span> <output id="rsv">0.55</output></span><input type="range" id="rs" min="0.3" max="0.85" step="0.01" value="0.55"></label>
+        <label for="ra"><span><span class="l-en">Recede Amount R</span><span class="l-fr">Amplitude du recul R</span> <output id="rav">0.35</output></span><input type="range" id="ra" min="0" max="0.7" step="0.01" value="0.35"></label>
+        <p class="hint"><span class="l-en">Move the sliders: the curve, the moving dot and the beach strip update. The dashed line marks the recede start, the pink arrow the recede amount, and the yellow dot the farthest point reached, where the wet sand begins.</span><span class="l-fr">Déplacez les curseurs : la courbe, le point mobile et la bande de plage se mettent à jour. La ligne pointillée marque le début du recul, la flèche rose l'amplitude du recul, et le point jaune l'endroit le plus loin atteint, où commence le sable mouillé.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="jouer">
+  <div class="wrap">
+    <p class="kicker"><span class="l-en">Try it</span><span class="l-fr">À essayer</span></p>
+    <h2><span class="l-en">The real settings, live</span><span class="l-fr">Les vrais réglages, en direct</span></h2>
+    <p class="lead"><span class="l-en">These sliders mirror the settings of the tool's panel in Maya and update the sea in real time. Presets are also available.</span><span class="l-fr">Ces curseurs reprennent les réglages du panneau de l'outil dans Maya et modifient la mer en temps réel. Des préréglages sont aussi disponibles.</span></p>
+    <div class="play-grid fam">
+      <div class="play-stage">
+        <canvas id="pg" width="576" height="324" aria-label="Live beach driven by the settings"></canvas>
+        <div class="play-bar"><button type="button" class="ae-btn" id="pg-play">Pause</button><span class="hint-s"><span class="l-en">Simplified version running in the browser. The real render is made in Maya with Arnold.</span><span class="l-fr">Version simplifiée qui tourne dans le navigateur. Le vrai rendu est fait dans Maya avec Arnold.</span></span></div>
+      </div>
+      <div class="ae" id="pg-panel" aria-label="Settings panel"></div>
+    </div>
+  </div>
+</section>
+
+<section class="band sand">
+  <div class="wrap">
+    <p class="kicker"><span class="l-en">A bit of code</span><span class="l-fr">Un peu de code</span></p>
+    <h2><span class="l-en">The same formula, in MEL</span><span class="l-fr">La même formule, en MEL</span></h2>
+    <p class="lead"><span class="l-en">The beginning of the real script for wave A, written in MEL, Maya's scripting language. It runs on every frame of the animation.</span><span class="l-fr">Le début du vrai script de la vague A, écrit en MEL, le langage de script de Maya. Il s'exécute à chaque image de l'animation.</span></p>
+    <div class="codegrid">
+      <div class="l-en"><pre class="code"><code><span class="c">// Where is the wave in its cycle? (1)</span>
+<span class="k">float</span> <span class="v">$T</span> = Ocean_Controls.waveCycleDuration;
+<span class="k">float</span> <span class="v">$timeShiftedA</span> = time + <span class="v">$T</span> * Ocean_Controls.phaseOffsetA;
+<span class="k">float</span> <span class="v">$rawCycleA</span> = <span class="v">$timeShiftedA</span> / <span class="v">$T</span>;
+<span class="k">float</span> <span class="v">$t</span> = <span class="v">$rawCycleA</span> - <span class="k">floor</span>(<span class="v">$rawCycleA</span>);
+
+<span class="c">// It advances and slows down (2)</span>
+<span class="k">float</span> <span class="v">$moveT</span> = <span class="v">$t</span>;
+<span class="k">if</span> (<span class="v">$moveT</span> &gt; <span class="n">0.6</span>) <span class="v">$moveT</span> = <span class="n">0.6</span>;
+<span class="v">$moveT</span> = <span class="v">$moveT</span> / <span class="n">0.6</span>;
+<mark><span class="k">float</span> <span class="v">$pos</span> = <span class="n">1</span> - <span class="k">pow</span>(<span class="n">1</span> - <span class="v">$moveT</span>, <span class="n">2</span>);</mark>
+<span class="k">float</span> <span class="v">$posMapped</span> = <span class="n">1.5</span> - <span class="v">$pos</span> * <span class="n">1.4</span>;
+
+<span class="c">// Then it recedes, smoothly (3)</span>
+<span class="k">if</span> (<span class="v">$t</span> &gt; <span class="v">$recedeStart</span>) {
+    <span class="v">$recede</span> = (<span class="v">$t</span> - <span class="v">$recedeStart</span>) / (<span class="n">1.0</span> - <span class="v">$recedeStart</span>);
+<mark>    <span class="v">$recede</span> = <span class="v">$recede</span> * <span class="v">$recede</span> * (<span class="n">3.0</span> - <span class="n">2.0</span> * <span class="v">$recede</span>);</mark>
+    <span class="v">$posMapped</span> += <span class="v">$recede</span> * <span class="v">$recedeMag</span>;
+}
+
+<span class="c">// Move the foam line mask (4)</span>
+Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">$posMapped</span>;</code></pre></div><div class="l-fr"><pre class="code"><code><span class="c">// Où en est la vague dans son cycle ? (1)</span>
+<span class="k">float</span> <span class="v">$T</span> = Ocean_Controls.waveCycleDuration;
+<span class="k">float</span> <span class="v">$timeShiftedA</span> = time + <span class="v">$T</span> * Ocean_Controls.phaseOffsetA;
+<span class="k">float</span> <span class="v">$rawCycleA</span> = <span class="v">$timeShiftedA</span> / <span class="v">$T</span>;
+<span class="k">float</span> <span class="v">$t</span> = <span class="v">$rawCycleA</span> - <span class="k">floor</span>(<span class="v">$rawCycleA</span>);
+
+<span class="c">// Elle avance et ralentit (2)</span>
+<span class="k">float</span> <span class="v">$moveT</span> = <span class="v">$t</span>;
+<span class="k">if</span> (<span class="v">$moveT</span> &gt; <span class="n">0.6</span>) <span class="v">$moveT</span> = <span class="n">0.6</span>;
+<span class="v">$moveT</span> = <span class="v">$moveT</span> / <span class="n">0.6</span>;
+<mark><span class="k">float</span> <span class="v">$pos</span> = <span class="n">1</span> - <span class="k">pow</span>(<span class="n">1</span> - <span class="v">$moveT</span>, <span class="n">2</span>);</mark>
+<span class="k">float</span> <span class="v">$posMapped</span> = <span class="n">1.5</span> - <span class="v">$pos</span> * <span class="n">1.4</span>;
+
+<span class="c">// Puis elle recule, en douceur (3)</span>
+<span class="k">if</span> (<span class="v">$t</span> &gt; <span class="v">$recedeStart</span>) {
+    <span class="v">$recede</span> = (<span class="v">$t</span> - <span class="v">$recedeStart</span>) / (<span class="n">1.0</span> - <span class="v">$recedeStart</span>);
+<mark>    <span class="v">$recede</span> = <span class="v">$recede</span> * <span class="v">$recede</span> * (<span class="n">3.0</span> - <span class="n">2.0</span> * <span class="v">$recede</span>);</mark>
+    <span class="v">$posMapped</span> += <span class="v">$recede</span> * <span class="v">$recedeMag</span>;
+}
+
+<span class="c">// On déplace le masque de la ligne d'écume (4)</span>
+Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">$posMapped</span>;</code></pre></div>
+      <ol class="notes">
+        <li><i>1</i><span><span class="l-en"><b>Time.</b> <code>time</code> is the current time in the animation. <code>$t</code>, between 0 and 1, is derived from it, as in the formula.</span><span class="l-fr"><b>Le temps.</b> <code>time</code> est le temps dans l'animation. On en tire <code>$t</code>, entre 0 et 1, comme dans la formule.</span></span></li>
+        <li><i>2</i><span><span class="l-en"><b>Ease-out.</b> The first highlighted line is the square from the formula: fast arrival, then deceleration.</span><span class="l-fr"><b>Le ralentissement.</b> La première ligne surlignée correspond au carré de la formule : arrivée rapide, puis ralentissement.</span></span></li>
+        <li><i>3</i><span><span class="l-en"><b>Receding.</b> The second highlighted line is the <em>smoothstep</em> function S(u) = u²(3 − 2u).</span><span class="l-fr"><b>Le recul.</b> La seconde ligne surlignée est la fonction <em>smoothstep</em> S(u) = u²(3 − 2u).</span></span></li>
+        <li><i>4</i><span><span class="l-en"><b>The mask.</b> The result moves a mask (a black and white gradient) that defines where the foam is painted. The full script is about 230 lines per wave.</span><span class="l-fr"><b>Le masque.</b> Le résultat déplace un masque (un dégradé noir et blanc) qui définit où peindre l'écume. Le script complet fait environ 230 lignes par vague.</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <p class="kicker"><span class="l-en">In numbers</span><span class="l-fr">En chiffres</span></p>
+    <h2><span class="l-en">The tool in a few numbers</span><span class="l-fr">L'outil en quelques chiffres</span></h2>
+    <div class="nums">
+      <div class="num"><b>3</b><span><span class="l-en">waves sharing the same formula, offset in time</span><span class="l-fr">vagues qui partagent la même formule, décalées dans le temps</span></span></div>
+      <div class="num"><b>~350</b><span><span class="l-en">nodes connected together in Maya</span><span class="l-fr">nœuds de calcul reliés entre eux dans Maya</span></span></div>
+      <div class="num"><b>50+</b><span><span class="l-en">settings, gathered in a single panel for artists</span><span class="l-fr">réglages, regroupés dans un seul panneau pour les artistes</span></span></div>
+      <div class="num"><b>0</b><span><span class="l-en">simulation to precompute: any frame can be reached directly</span><span class="l-fr">simulation à précalculer : chaque image est accessible directement</span></span></div>
+    </div>
+    <figure class="network">
+      <img src="media/hypershade_overview.webp" alt="Overview of the node network in Maya's Hypershade" loading="lazy">
+      <figcaption><b><span class="l-en">The ~350 nodes, seen from afar</span><span class="l-fr">Les ~350 nœuds, vus de loin</span></b><span class="l-en">Each rectangle is an operation (noise, gradient, color mix). Their connections form the shader, a visual equivalent of code.</span><span class="l-fr">Chaque rectangle est une opération (bruit, dégradé, mélange de couleurs). Leurs connexions forment le shader, l'équivalent visuel du code.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap"><span class="l-en">Clémentine Garoche · VFX R&amp;D internship at OLM Digital, 2026 · olmShoreline tool for Maya and Arnold. Images are renders from the tool, except the film excerpts shown as references.</span><span class="l-fr">Clémentine Garoche · stage R&amp;D VFX chez OLM Digital, 2026 · outil olmShoreline pour Maya et Arnold. Les images sont des rendus de l'outil, sauf les extraits de films montrés comme références.</span></div>
+</footer>
+
+<script>
+(function(){
+  var KEY='olmShoreline-lang', DEF='fr';
+  function get(){ try{ return localStorage.getItem(KEY)||DEF; }catch(e){ return DEF; } }
+  function set(l){
+    document.documentElement.setAttribute('data-l',l); document.documentElement.lang=l;
+    try{ localStorage.setItem(KEY,l); }catch(e){}
+    [].forEach.call(document.querySelectorAll('[data-set-l]'),function(b){ b.setAttribute('aria-pressed',b.dataset.setL===l?'true':'false'); });
+    window.dispatchEvent(new CustomEvent('langchange',{detail:l}));
+  }
+  window.curLang=function(){ return document.documentElement.getAttribute('data-l')||DEF; };
+  document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('[data-set-l]'); if(b) set(b.dataset.setL); });
+  set(get());
+})();
+
+
+(function(){
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- formulas (MathML output, no stylesheet needed) ---------- */
+  if (window.katex) [].forEach.call(document.querySelectorAll('.tex[data-tex]'), function(el){
+    try { el.innerHTML = katex.renderToString(el.dataset.tex, {output:'mathml', displayMode:true, throwOnError:false}); } catch(e){}
+  });
+
+  /* ---------- videos: play while visible ---------- */
+  var vids = [].slice.call(document.querySelectorAll('video'));
+  if ('IntersectionObserver' in window){
+    var vo = new IntersectionObserver(function(es){ es.forEach(function(e){
+      var v=e.target; if(e.isIntersecting){ if(!reduce){ var p=v.play(); if(p&&p.catch)p.catch(function(){}); } } else v.pause();
+    }); }, {rootMargin:'150px 0px'});
+    vids.forEach(function(v){ v.muted=true; if(reduce) v.removeAttribute('autoplay'); vo.observe(v); });
+  }
+
+  /* ---------- the wave model (port of Expression_A) ---------- */
+  function sstep(u){ u=Math.max(0,Math.min(1,u)); return u*u*(3-2*u); }
+  function frontPos(t, rs, ra){
+    var m=Math.min(t,0.6)/0.6, p=1-Math.pow(1-m,2), x=1.5-1.4*p;
+    if (t>rs) x += sstep((t-rs)/(1-rs))*ra;
+    return x;
+  }
+  function farthest(rs, ra){ var best=9, tb=0; for(var i=0;i<=400;i++){ var t=i/400, x=frontPos(t,rs,ra); if(x<best){best=x;tb=t;} } return {x:best,t:tb}; }
+
+  /* ---------- live canvas ---------- */
+  var cv=document.getElementById('sea'), ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+  var img=ctx.createImageData(W,H), D=img.data;
+  function hash(x,y,s){ var h=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453; return h-Math.floor(h); }
+  function vnoise(x,s){ var i=Math.floor(x), f=x-i, u=f*f*(3-2*f); return hash(i,0,s)*(1-u)+hash(i+1,0,s)*u; }
+  function fbm(x,s){ return vnoise(x,s)*0.65+vnoise(x*2.1,s+3)*0.35; }
+  function worley(x,y,s){
+    var ix=Math.floor(x), iy=Math.floor(y), f1=9, f2=9;
+    for(var j=-1;j<=1;j++) for(var i=-1;i<=1;i++){
+      var cx=ix+i, cy=iy+j, px=cx+hash(cx,cy,s)*0.9, py=cy+hash(cy,cx,s+7)*0.9, dx=px-x, dy=py-y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<f1){f2=f1;f1=d;} else if(d<f2) f2=d;
+    }
+    return f2-f1;
+  }
+  var T=12, phase=[0.6,0.2,0], RS=0.55, RA=0.35, DRY=2, FAR=farthest(RS,RA);
+  var SAND=[184,167,134], WATER0=[38,58,132], WATER1=[27,41,99], FOAM=[246,249,255];
+  var warp=[], dash=[], spl=[];
+  for (var f=0; f<3; f++){
+    warp[f]=new Float32Array(W); dash[f]=new Float32Array(W);
+    for (var x=0;x<W;x++){ var sx=x/W*1.6; warp[f][x]=(fbm(sx*6+f*13.1, f+1)-0.5)*0.07; dash[f][x]=fbm(sx*14+f*7.7, f+20); }
+  }
+  function frame(time){
+    var fr=[];
+    for (var f=0; f<3; f++){
+      var tt=time/T+phase[f], t=tt-Math.floor(tt), m=Math.min(t,0.6)/0.6;
+      var x=frontPos(t,RS,RA), birth=sstep(m/0.15);
+      var width=(0.02*birth+m*0.03)*1.345, plateau=(0.01*birth+m*0.015)*1.345*2.803;
+      var shrink= t>0.35 ? sstep((t-0.35)/0.65) : 0;
+      width=width*(1-shrink)+0.0008*shrink; plateau=plateau*(1-shrink)+0.0008*shrink;
+      var db=sstep((m-0.25)/0.4), dpos=0.88*(1-db);
+      var rise= m>0.47 ? sstep((m-0.47)/0.13) : 0, fall= t>0.34 ? sstep(1-(t-0.34)/(0.8-0.34)) : 1;
+      var reach, age; if (t<FAR.t){ reach=x; age=(t+1-FAR.t)*T; } else { reach=FAR.x; age=(t-FAR.t)*T; }
+      var wet=sstep(1-age/DRY)*0.4;
+      var splashOn = db>0.99 && t<RS ? 1 : 0;
+      fr.push({t:t,x:x,w:width,pl:plateau,dpos:dpos,db:db,sh:0.022*rise*fall,reach:reach,wet:wet,spl:splashOn,veil:sstep((db-0.5)/0.5),f:f});
+    }
+    fr.sort(function(a,b){ return b.t-a.t; }); // oldest first, freshest on top
+    var seed=Math.floor(time*24/4)%5;
+    for (var py=0; py<H; py++){
+      var U=0.68-py/H*0.62;
+      for (var px=0; px<W; px++){
+        var r=SAND[0], g=SAND[1], b=SAND[2];
+        for (var k=0;k<3;k++){
+          var F=fr[k], Uw=U+warp[F.f][px], d=Uw-F.x;
+          if (Uw>F.reach && F.wet>0){ r*=1-F.wet; g*=1-F.wet; b*=1-F.wet; }
+          if (d<=0 && d>-F.sh){ r*=0.45; g*=0.45; b*=0.45; }         // cast shadow just ahead of the foam
+          if (d>0){                                                    // water behind the front
+            var gw=Math.min(1,Math.max(0,(U-0.1)/0.6));
+            r=WATER0[0]+(WATER1[0]-WATER0[0])*gw; g=WATER0[1]+(WATER1[1]-WATER0[1])*gw; b=WATER0[2]+(WATER1[2]-WATER0[2])*gw;
+            if (d<F.pl+F.w && F.veil>0){                              // cellular veins in the surf band
+              var dense = d<0.05, sc = dense?34:20;
+              var e=worley(px/W*1.6*sc*0.55, (Uw-F.x*0.7)*sc, F.f*9+(dense?1:2));
+              var lw = dense?0.07:0.06;
+              if (e<lw*F.veil){ r=FOAM[0]; g=FOAM[1]; b=FOAM[2]; }
+            }
+          }
+          if (Math.abs(d)<0.008 && dash[F.f][px]>F.dpos){ r=FOAM[0]; g=FOAM[1]; b=FOAM[2]; }  // foam line, born as dashes
+          if (F.spl && d>-0.07 && d<0.025 && hash(px>>1,py>>1,seed+F.f*5)>0.988){ r=FOAM[0]; g=FOAM[1]; b=FOAM[2]; }
+        }
+        var i=(py*W+px)*4; D[i]=r; D[i+1]=g; D[i+2]=b; D[i+3]=255;
+      }
+    }
+    ctx.putImageData(img,0,0);
+  }
+  var running=!reduce, t0=performance.now(), offset=6, last=0, btn=document.getElementById('pause');
+  function loop(now){
+    if (!running) return;
+    if (now-last>40){ last=now; frame(offset+(now-t0)/1000); }
+    requestAnimationFrame(loop);
+  }
+  frame(offset);
+  function Lx(en,fr){ return (window.curLang&&curLang()==='en')?en:fr; }
+  btn.textContent=running?Lx('Pause','Pause'):Lx('Play','Lecture');
+  if (running) requestAnimationFrame(loop);
+  btn.addEventListener('click', function(){
+    running=!running; btn.textContent=running?Lx('Pause','Pause'):Lx('Play','Lecture');
+    if (running){ t0=performance.now()-(offset-6)*1000; offset=6; requestAnimationFrame(loop); }
+    else { offset=offset+(performance.now()-t0)/1000; t0=performance.now(); }
+  });
+  if ('IntersectionObserver' in window) new IntersectionObserver(function(es){
+    var vis=es[0].isIntersecting;
+    if (!vis && running){ running=false; offset=offset+(performance.now()-t0)/1000; cv.dataset.auto='1'; }
+    else if (vis && cv.dataset.auto==='1' && !reduce){ cv.dataset.auto=''; running=true; t0=performance.now(); requestAnimationFrame(loop); }
+  }).observe(cv);
+
+
+(function(){
+  var fx=document.getElementById('fx-fr'); if(!fx) return;
+  var INFO={"start": ["Position de départ", "1,5 place la vague juste au-delà du plan, au large, au début de chaque cycle."], "scale": ["Mise à l'échelle", "1,4 est la distance parcourue : la vague va de 1,5 jusqu'à 0,1 sur le plan."], "norm": ["Avancée normalisée", "La fraction du cycle t, bloquée à 0,6 puis ramenée entre 0 et 1 : la vague avance pendant les 60 premiers pour cent du cycle."], "ease": ["Ralentissement", "1 − (1 − x)² : la vague arrive vite, puis freine en approchant du bord."], "amount": ["Amplitude du recul", "La distance dont la vague recule vers le large. C'est un réglage de l'outil."], "smooth": ["Smoothstep", "S(u) = u²(3 − 2u) : démarre et s'arrête en douceur, sans à-coup. Utilisée pour toutes les transitions."], "progress": ["Progression du recul", "Vaut 0 jusqu'au début du recul, puis monte jusqu'à 1 à la fin du cycle."]}, SEG={"start": "adv", "scale": "adv", "norm": "adv", "ease": "adv", "amount": "rec", "smooth": "rec", "progress": "rec"}, COL={"start": "#ff8a5b", "scale": "#ffc145", "norm": "#5ec8f2", "ease": "#7d8cff", "amount": "#ff5fa2", "smooth": "#4fd1a5", "progress": "#c38bff"};
+  var info=document.getElementById('fx-info-fr'), base=info.innerHTML, pinned=null;
+  function set(k){
+    if(k){ fx.dataset.hl=k; info.innerHTML='<b style="color:'+COL[k]+'">'+INFO[k][0]+'</b>'+INFO[k][1]; }
+    else { delete fx.dataset.hl; info.innerHTML=base; }
+    window.__fxSeg = k ? SEG[k] : null; window.__fxCol = k ? COL[k] : null;
+    if (window.__fxRedraw) window.__fxRedraw();
+  }
+  function key(e){ var t=e.target.closest&&e.target.closest('[data-k]'); return t&&fx.contains(t)?t.dataset.k:null; }
+  fx.addEventListener('mouseover',function(e){ if(!pinned) set(key(e)); });
+  fx.addEventListener('mouseleave',function(){ if(!pinned) set(null); });
+  fx.addEventListener('focusin',function(e){ if(!pinned) set(key(e)); });
+  fx.addEventListener('click',function(e){ var k=key(e); if(!k) return; e.stopPropagation(); pinned=(pinned===k)?null:k; set(pinned); });
+  document.addEventListener('click',function(e){ if(pinned && !fx.contains(e.target)){ pinned=null; set(null); } });
+})();
+(function(){
+  var fx=document.getElementById('fx-en'); if(!fx) return;
+  var INFO={"start": ["Start position", "1.5 puts the front just beyond the plane, out at sea, at the start of each cycle."], "scale": ["Scale to the plane", "1.4 is the travel distance: the front can move from 1.5 down to 0.1 in UV space."], "norm": ["Normalized advance", "The cycle fraction t, capped at 0.6 and rescaled to 0 → 1: the front advances during the first 60 % of the cycle."], "ease": ["Ease-out", "1 − (1 − x)²: fast arrival, then a natural deceleration as the front reaches the shore."], "amount": ["Recede Amount", "How far the front pulls back toward the sea. Exposed on the control node."], "smooth": ["Smoothstep", "S(u) = u²(3 − 2u): starts and ends without a jolt. Used for every transition in the shader."], "progress": ["Recede progress", "0 until Recede Start, then rises to 1 at the end of the cycle."]}, SEG={"start": "adv", "scale": "adv", "norm": "adv", "ease": "adv", "amount": "rec", "smooth": "rec", "progress": "rec"}, COL={"start": "#ff8a5b", "scale": "#ffc145", "norm": "#5ec8f2", "ease": "#7d8cff", "amount": "#ff5fa2", "smooth": "#4fd1a5", "progress": "#c38bff"};
+  var info=document.getElementById('fx-info-en'), base=info.innerHTML, pinned=null;
+  function set(k){
+    if(k){ fx.dataset.hl=k; info.innerHTML='<b style="color:'+COL[k]+'">'+INFO[k][0]+'</b>'+INFO[k][1]; }
+    else { delete fx.dataset.hl; info.innerHTML=base; }
+    window.__fxSeg = k ? SEG[k] : null; window.__fxCol = k ? COL[k] : null;
+    if (window.__fxRedraw) window.__fxRedraw();
+  }
+  function key(e){ var t=e.target.closest&&e.target.closest('[data-k]'); return t&&fx.contains(t)?t.dataset.k:null; }
+  fx.addEventListener('mouseover',function(e){ if(!pinned) set(key(e)); });
+  fx.addEventListener('mouseleave',function(){ if(!pinned) set(null); });
+  fx.addEventListener('focusin',function(e){ if(!pinned) set(key(e)); });
+  fx.addEventListener('click',function(e){ var k=key(e); if(!k) return; e.stopPropagation(); pinned=(pinned===k)?null:k; set(pinned); });
+  document.addEventListener('click',function(e){ if(pinned && !fx.contains(e.target)){ pinned=null; set(null); } });
+})();
+
+
+  /* ---------- interactive plot ---------- */
+  var svg=document.getElementById('plot'), NS='http://www.w3.org/2000/svg';
+  var L=56, R=584, TOP=18, BOT=232, beachY=284;
+  function gx(t){ return L+t*(R-L); }
+  function gy(x){ return TOP+(x-0.1)/(1.5-0.1)*(BOT-TOP); }
+  function el(n,a,txt){ var e=document.createElementNS(NS,n); for(var k in a){ var v=String(a[k]); if(v.indexOf('var(')>=0) e.style.setProperty(k,v); else e.setAttribute(k,v); } if(txt!=null) e.textContent=txt; svg.appendChild(e); return e; }
+  var css=getComputedStyle(document.documentElement);
+  function tok(n){ return css.getPropertyValue(n).trim(); }
+  function draw(rs,ra,tNow){
+    svg.innerHTML='';
+    var ink='var(--ink)', mut='var(--muted)', line='var(--line)';
+    el('line',{x1:gx(rs),x2:gx(rs),y1:TOP,y2:BOT,stroke:'var(--sand-ink)','stroke-dasharray':'4 4'});
+    el('text',{x:gx(rs)+6,y:BOT-8,fill:'var(--sand-ink)','font-size':12,'font-family':'var(--f-mono)'},'tᵣ');
+    [0,0.25,0.5,0.75,1].forEach(function(v){
+      el('line',{x1:gx(v),x2:gx(v),y1:BOT,y2:BOT+5,stroke:mut});
+      el('text',{x:gx(v),y:BOT+18,fill:mut,'font-size':11,'text-anchor':'middle','font-family':'var(--f-mono)'},String(v));
+    });
+    el('line',{x1:L,x2:R,y1:BOT,y2:BOT,stroke:line});
+    el('line',{x1:L,x2:L,y1:TOP,y2:BOT,stroke:line});
+    el('text',{x:L-8,y:TOP+10,fill:mut,'font-size':11,'text-anchor':'end'},Lx('beach','plage'));
+    el('text',{x:L-8,y:BOT,fill:mut,'font-size':11,'text-anchor':'end'},Lx('sea','large'));
+    el('text',{x:R,y:BOT+36,fill:mut,'font-size':11,'text-anchor':'end'},Lx('fraction of the cycle t →','fraction du cycle t →'));
+    var d='';
+    for (var i=0;i<=200;i++){ var t=i/200; d+=(i?'L':'M')+gx(t).toFixed(1)+' '+gy(Math.min(1.5,frontPos(t,rs,ra))).toFixed(1); }
+    el('path',{d:d,fill:'none',stroke:'var(--accent)','stroke-width':3,'stroke-linecap':'round'});
+    // recede amount: trajectory without recede (dashed) and a pink arrow of height R at the end of the cycle
+    var d0=''; for (var q=0;q<=100;q++){ var tq=rs+(1-rs)*q/100; d0+=(q?'L':'M')+gx(tq).toFixed(1)+' '+gy(frontPos(tq,1,0)).toFixed(1); }
+    el('path',{d:d0,fill:'none',stroke:'#ff5fa2','stroke-width':1.5,'stroke-dasharray':'3 4','stroke-opacity':.8});
+    if (ra>0.005){ var xa=gx(1)-6, y0=gy(frontPos(1,1,0)), y1=gy(Math.min(1.5,frontPos(1,rs,ra)));
+      el('line',{x1:xa,x2:xa,y1:y0,y2:y1,stroke:'#ff5fa2','stroke-width':2.5});
+      el('path',{d:'M'+(xa-5)+' '+(y1-(y1>y0?7:-7))+' L'+xa+' '+y1+' L'+(xa+5)+' '+(y1-(y1>y0?7:-7)),fill:'none',stroke:'#ff5fa2','stroke-width':2.5});
+      el('text',{x:xa-10,y:(y0+y1)/2+4,fill:'#ff5fa2','font-size':13,'font-weight':700,'text-anchor':'end','font-family':'var(--f-mono)'},'R'); }
+    if (window.__fxSeg){ var a0=window.__fxSeg==='adv'?0:rs, a1=window.__fxSeg==='adv'?0.6:1, d2='';
+      for (var j=0;j<=80;j++){ var tj=a0+(a1-a0)*j/80; d2+=(j?'L':'M')+gx(tj).toFixed(1)+' '+gy(Math.min(1.5,frontPos(tj,rs,ra))).toFixed(1); }
+      el('path',{d:d2,fill:'none',stroke:window.__fxCol,'stroke-width':8,'stroke-opacity':.55,'stroke-linecap':'round'}); }
+    var far=farthest(rs,ra);
+    el('circle',{cx:gx(far.t),cy:gy(far.x),r:6,fill:'var(--c)',stroke:'var(--panel)','stroke-width':2});
+    var xn=Math.min(1.5,frontPos(tNow,rs,ra));
+    el('circle',{cx:gx(tNow),cy:gy(xn),r:7,fill:'var(--panel)',stroke:'var(--accent)','stroke-width':3});
+    // mini beach: sea on the left, sand on the right, foam line at the front position
+    var bx=function(x){ return L+(1.5-x)/1.4*(R-L); };
+    el('rect',{x:L,y:beachY,width:R-L,height:20,rx:3,fill:'var(--sand)'});
+    el('rect',{x:L,y:beachY,width:Math.max(0,Math.min(R-L,bx(xn)-L)),height:20,rx:3,fill:'var(--water)'});
+    el('rect',{x:Math.min(R,bx(xn))-3,y:beachY,width:4,height:20,fill:'#fff'});
+    el('rect',{x:bx(far.x)-1,y:beachY-4,width:2,height:28,fill:'var(--c)'});
+  }
+  var rsI=document.getElementById('rs'), raI=document.getElementById('ra');
+  function rsv(){ return +rsI.value; } function rav(){ return +raI.value; }
+  var pt=0.35, pl=performance.now();
+  function upd(){ document.getElementById('rsv').textContent=rsv().toFixed(2); document.getElementById('rav').textContent=rav().toFixed(2); draw(rsv(),rav(),pt); }
+  rsI.addEventListener('input',upd); raI.addEventListener('input',upd);
+  window.__fxRedraw=function(){ draw(rsv(),rav(),pt); };
+  upd();
+  if (!reduce){
+    (function anim(now){ pt=(pt+(now-pl)/6000)%1; pl=now; draw(rsv(),rav(),pt); requestAnimationFrame(anim); })(performance.now());
+  }
+})();
+</script>
+
+<script>
+/* olmShoreline — simplified real-time JS port of the MEL expressions and shading layers */
+window.OlmSea = (function(){
+  function sstep(u){ u=Math.max(0,Math.min(1,u)); return u*u*(3-2*u); }
+  function frontPos(t, rs, ra){
+    var m=Math.min(t,0.6)/0.6, p=1-Math.pow(1-m,2), x=1.5-1.4*p;
+    if (t>rs) x += sstep((t-rs)/(1-rs))*ra;
+    return x;
+  }
+  function farthest(rs, ra){ var best=9, tb=0; for(var i=0;i<=400;i++){ var t=i/400, x=frontPos(t,rs,ra); if(x<best){best=x;tb=t;} } return {x:best,t:tb}; }
+  function hash(x,y,s){ var h=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453; return h-Math.floor(h); }
+  function vnoise(x,s){ var i=Math.floor(x), f=x-i, u=f*f*(3-2*f); return hash(i,0,s)*(1-u)+hash(i+1,0,s)*u; }
+  function fbm(x,s){ return vnoise(x,s)*0.65+vnoise(x*2.1,s+3)*0.35; }
+  function worley(x,y,s,out){
+    var ix=Math.floor(x), iy=Math.floor(y), f1=9, f2=9;
+    for(var j=-1;j<=1;j++) for(var i=-1;i<=1;i++){
+      var cx=ix+i, cy=iy+j, px=cx+hash(cx,cy,s)*0.9, py=cy+hash(cy,cx,s+7)*0.9, dx=px-x, dy=py-y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<f1){f2=f1;f1=d;} else if(d<f2) f2=d;
+    }
+    out[0]=f1; out[1]=f2;
+  }
+  function hex(c){ c=c.replace('#',''); return [parseInt(c.substr(0,2),16),parseInt(c.substr(2,2),16),parseInt(c.substr(4,2),16)]; }
+
+  var DEFAULTS = {
+    waveCycleDuration:12, phaseOffsetA:0.6, phaseOffsetB:0.2, phaseOffsetC:0,
+    recedeStart:0.55, recedeAmount:0.35, dashBirthStart:0.25, dashBirthDuration:0.4,
+    surfBandWidthScale:1.345, surfBandTrailScale:2.803, foamBandWidth:0.0096,
+    shorelineWarpAmplitude:0.05, shorelineWarpScale:10,
+    cellPattern:0, gridSize:12, lineWidth:1, cellRepeatV:1,
+    enableSplash:true, splashAmount:1, splashFlickerSpeed:2,
+    enableWetSand:true, wetSandDryDuration:2, wetSandOpacity:0.4,
+    enableShadow:true, shadowOpacity:0.73, shadowBandMaxWidth:0.042,
+    waterNear:'#263a84', waterFar:'#1b2963', foamColor:'#f6f9ff', beachColor:'#b8a786'
+  };
+
+  function create(canvas, params){
+    var P = Object.assign({}, DEFAULTS, params||{});
+    var ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height;
+    var img=ctx.createImageData(W,H), D=img.data, wv=[0,0];
+    var warp=[], dash=[], far, cols;
+    function prep(){
+      for (var f=0; f<3; f++){
+        warp[f]=new Float32Array(W); dash[f]=new Float32Array(W);
+        for (var x=0;x<W;x++){ var sx=x/W*1.6;
+          warp[f][x]=(fbm(sx*P.shorelineWarpScale*0.6+f*13.1, f+1)-0.5)*P.shorelineWarpAmplitude*1.4;
+          dash[f][x]=fbm(sx*14+f*7.7, f+20); }
+      }
+      far=farthest(P.recedeStart,P.recedeAmount);
+      cols={wn:hex(P.waterNear),wf:hex(P.waterFar),fo:hex(P.foamColor),be:hex(P.beachColor)};
+    }
+    prep();
+    function frame(time){
+      var fr=[], T=P.waveCycleDuration, ph=[P.phaseOffsetA,P.phaseOffsetB,P.phaseOffsetC];
+      for (var f=0; f<3; f++){
+        var tt=time/T+ph[f], t=tt-Math.floor(tt), m=Math.min(t,0.6)/0.6;
+        var x=frontPos(t,P.recedeStart,P.recedeAmount), birth=sstep(m/0.15);
+        var width=(0.02*birth+m*0.03)*P.surfBandWidthScale, plateau=(0.01*birth+m*0.015)*P.surfBandWidthScale*P.surfBandTrailScale;
+        var shrink= t>0.35 ? sstep((t-0.35)/0.65) : 0;
+        width=width*(1-shrink)+0.0008*shrink; plateau=plateau*(1-shrink)+0.0008*shrink;
+        var db=sstep((m-P.dashBirthStart)/Math.max(0.01,P.dashBirthDuration)), dpos=0.88*(1-db);
+        var sStart=P.dashBirthStart+P.dashBirthDuration*0.55;
+        var rise= m>sStart ? sstep((m-sStart)/0.13) : 0, fall= t>0.34 ? sstep(1-(t-0.34)/(0.8-0.34)) : 1;
+        var reach, age; if (t<far.t){ reach=x; age=(t+1-far.t)*T; } else { reach=far.x; age=(t-far.t)*T; }
+        var wet=P.enableWetSand ? sstep(1-age/Math.max(0.1,P.wetSandDryDuration))*P.wetSandOpacity : 0;
+        fr.push({t:t,x:x,w:width,pl:plateau,dpos:dpos,sh:P.enableShadow?P.shadowBandMaxWidth*0.55*rise*fall:0,
+                 reach:reach,wet:wet,spl:P.enableSplash && db>0.99 && t<P.recedeStart,veil:sstep((db-0.5)/0.5),f:f});
+      }
+      fr.sort(function(a,b){ return b.t-a.t; });
+      var fps=24, seed = P.splashFlickerSpeed<=0 ? 1 : Math.floor(time*fps/Math.max(1,8/P.splashFlickerSpeed))%5;
+      var thr=1-0.012*P.splashAmount, shadowK=1-P.shadowOpacity*0.75, fw=P.foamBandWidth*0.85;
+      var C=cols, gs=P.gridSize, lwk=P.lineWidth, pat=+P.cellPattern, rv=P.cellRepeatV;
+      for (var py=0; py<H; py++){
+        var U=0.68-py/H*0.62, gw=Math.min(1,Math.max(0,(U-0.1)/0.6));
+        var wr=C.wn[0]+(C.wf[0]-C.wn[0])*gw, wg=C.wn[1]+(C.wf[1]-C.wn[1])*gw, wb=C.wn[2]+(C.wf[2]-C.wn[2])*gw;
+        for (var px=0; px<W; px++){
+          var r=C.be[0], g=C.be[1], b=C.be[2];
+          for (var k=0;k<3;k++){
+            var F=fr[k], Uw=U+warp[F.f][px], d=Uw-F.x;
+            if (Uw>F.reach && F.wet>0){ r*=1-F.wet; g*=1-F.wet; b*=1-F.wet; }
+            if (d<=0 && d>-F.sh){ r*=shadowK; g*=shadowK; b*=shadowK; }
+            if (d>0){
+              r=wr; g=wg; b=wb;
+              if (d<F.pl+F.w && F.veil>0){
+                var dense=d<0.05, sc=gs*(dense?2.8:1.67);
+                worley(px/W*1.6*sc*0.55, (Uw-F.x*0.7)*sc*rv, F.f*9+(dense?1:2), wv);
+                var lw=(dense?0.07:0.06)*lwk*F.veil, on;
+                if (pat===1) on=Math.abs(wv[0]-0.42)<lw*0.55;
+                else if (pat===2) on=(wv[1]-wv[0])<lw*0.6;
+                else on=(wv[1]-wv[0])<lw;
+                if (on){ r=C.fo[0]; g=C.fo[1]; b=C.fo[2]; }
+              }
+            }
+            if (Math.abs(d)<fw && dash[F.f][px]>F.dpos){ r=C.fo[0]; g=C.fo[1]; b=C.fo[2]; }
+            if (F.spl && d>-0.07 && d<0.025 && hash(px>>1,py>>1,seed+F.f*5)>thr){ r=C.fo[0]; g=C.fo[1]; b=C.fo[2]; }
+          }
+          var i=(py*W+px)*4; D[i]=r; D[i+1]=g; D[i+2]=b; D[i+3]=255;
+        }
+      }
+      ctx.putImageData(img,0,0);
+    }
+    return { P:P, frame:frame, prep:prep, set:function(k,v){ P[k]=v; prep(); }, reset:function(o){ Object.assign(P,DEFAULTS,o||{}); prep(); } };
+  }
+
+  /* Attribute-Editor-like panel */
+  var GROUPS = [
+    ['Timing & Motion', [
+      ['waveCycleDuration','Wave Cycle Duration',4,20,0.5],['phaseOffsetA','Phase Offset A',0,1,0.01],['phaseOffsetB','Phase Offset B',0,1,0.01],['phaseOffsetC','Phase Offset C',0,1,0.01],
+      ['recedeStart','Recede Start',0.3,0.85,0.01],['recedeAmount','Recede Amount',0,0.7,0.01],['dashBirthStart','Dash Birth Start',0,0.6,0.01],['dashBirthDuration','Dash Birth Duration',0.05,1,0.01]]],
+    ['Surf Line Shape', [
+      ['surfBandWidthScale','Surf Band Width Scale',0.3,3,0.01],['surfBandTrailScale','Surf Band Trail Scale',0.5,5,0.01],['foamBandWidth','Foam Band Width',0.003,0.03,0.0005],
+      ['shorelineWarpAmplitude','Shoreline Warp Amplitude',0,0.15,0.001],['shorelineWarpScale','Shoreline Warp Scale',1,20,0.1]]],
+    ['Cellular Veins', [
+      ['cellPattern','Cell Pattern Type',['Cellular 1','Cellular 2','Voronoi']],['gridSize','Grid Size',5,22,0.5],['lineWidth','Line Width',0.3,2.5,0.01],['cellRepeatV','Cell Repeat V',0.4,2,0.01]]],
+    ['Splash', [['enableSplash','Enable Splash','bool'],['splashAmount','Splash Amount',0,3,0.01],['splashFlickerSpeed','Splash Flicker Speed',0,8,0.1]]],
+    ['Wet Sand', [['enableWetSand','Enable Wet Sand','bool'],['wetSandDryDuration','Wet Sand Dry Duration',0.5,8,0.1],['wetSandOpacity','Wet Sand Opacity',0,1,0.01]]],
+    ['Shadow', [['enableShadow','Enable Shadow','bool'],['shadowOpacity','Shadow Opacity',0,1,0.01],['shadowBandMaxWidth','Shadow Band Max Width',0,0.15,0.001]]],
+    ['Colors', [['waterNear','Water (shore)','color'],['waterFar','Water (open sea)','color'],['foamColor','Foam Color','color'],['beachColor','Beach Color','color']]]
+  ];
+  var PRESETS = {
+    'Lugia (default)': {},
+    'EVA sea': {waterNear:'#e0313c',waterFar:'#c81e2a',beachColor:'#d7a5b6',foamColor:'#ffd9df',cellPattern:2,gridSize:9,lineWidth:1.3,enableShadow:false,shorelineWarpAmplitude:0.03},
+    'Tropical': {waterNear:'#3fc1b0',waterFar:'#0f5a5e',beachColor:'#e6d6a8',foamColor:'#f4fffd',cellPattern:1,gridSize:14,surfBandTrailScale:3.6,wetSandOpacity:0.3},
+    'Stormy': {waveCycleDuration:6,waterNear:'#2d3d5c',waterFar:'#141c2e',beachColor:'#7d7768',foamColor:'#e8eef7',splashAmount:2.6,splashFlickerSpeed:6,shorelineWarpAmplitude:0.1,shorelineWarpScale:4}
+  };
+  function panel(root, sea, opts){
+    opts=opts||{}; var L=opts.labels||{}, inputs={};
+    function lab(s){ return L[s]||s; }
+    var top=document.createElement('div'); top.className='ae-top';
+    var reset=document.createElement('button'); reset.type='button'; reset.className='ae-btn'; reset.textContent=lab('Set back default parameters');
+    top.appendChild(reset);
+    var pre=document.createElement('div'); pre.className='ae-presets';
+    Object.keys(PRESETS).forEach(function(n){ var b=document.createElement('button'); b.type='button'; b.className='ae-chip'; b.textContent=lab(n); b.onclick=function(){ sea.reset(PRESETS[n]); sync(); opts.onChange&&opts.onChange(); }; pre.appendChild(b); });
+    top.appendChild(pre); root.appendChild(top);
+    GROUPS.forEach(function(g,gi){
+      var det=document.createElement('details'); det.className='ae-group'; if(gi<3) det.open=true;
+      var sum=document.createElement('summary'); sum.textContent=lab(g[0]); det.appendChild(sum);
+      g[1].forEach(function(row){
+        var key=row[0], id=(opts.idPrefix||'ae')+'-'+key, wrap=document.createElement('div'); wrap.className='ae-row';
+        var l=document.createElement('label'); l.htmlFor=id; l.textContent=lab(row[1]); wrap.appendChild(l);
+        var inp, out;
+        if (Array.isArray(row[2])){ inp=document.createElement('select'); row[2].forEach(function(o,i){ var op=document.createElement('option'); op.value=i; op.textContent=o; inp.appendChild(op); }); }
+        else if (row[2]==='bool'){ inp=document.createElement('input'); inp.type='checkbox'; }
+        else if (row[2]==='color'){ inp=document.createElement('input'); inp.type='color'; }
+        else { inp=document.createElement('input'); inp.type='range'; inp.min=row[2]; inp.max=row[3]; inp.step=row[4];
+          out=document.createElement('output'); out.htmlFor=id; }
+        inp.id=id; inputs[key]={el:inp,out:out,row:row};
+        var ctl=document.createElement('div'); ctl.className='ae-ctl'; if(out) ctl.appendChild(out); ctl.appendChild(inp); wrap.appendChild(ctl);
+        inp.addEventListener('input',function(){
+          var v = row[2]==='bool'? inp.checked : (row[2]==='color'? inp.value : +inp.value);
+          sea.set(key,v); if(out) out.textContent=fmt(v,row[4]); greys(); opts.onChange&&opts.onChange();
+        });
+        det.appendChild(wrap);
+      });
+      root.appendChild(det);
+    });
+    function fmt(v,step){ var d=step<0.001?4:step<0.01?3:step<1?2:1; return (+v).toFixed(d); }
+    function greys(){
+      var P=sea.P, dep={splashAmount:'enableSplash',splashFlickerSpeed:'enableSplash',wetSandDryDuration:'enableWetSand',wetSandOpacity:'enableWetSand',shadowOpacity:'enableShadow',shadowBandMaxWidth:'enableShadow'};
+      for (var k in dep){ var on=!!P[dep[k]]; inputs[k].el.disabled=!on; inputs[k].el.closest('.ae-row').classList.toggle('off',!on); }
+    }
+    function sync(){ var P=sea.P; for (var k in inputs){ var it=inputs[k], v=P[k];
+      if (it.row[2]==='bool') it.el.checked=!!v; else it.el.value=v; if(it.out) it.out.textContent=fmt(v,it.row[4]); } greys(); }
+    reset.onclick=function(){ sea.reset(); sync(); opts.onChange&&opts.onChange(); };
+    sync();
+  }
+  return { create:create, panel:panel, frontPos:frontPos, farthest:farthest, DEFAULTS:DEFAULTS };
+})();
+
+(function(){
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cv=document.getElementById('pg'); if(!cv) return;
+  var sea=OlmSea.create(cv), running=!reduce, t0=performance.now(), offset=6, last=0, btn=document.getElementById('pg-play');
+  function now(){ return running ? offset+(performance.now()-t0)/1000 : offset; }
+  function tick(ts){ if(!running) return; if(ts-last>40){ last=ts; sea.frame(now()); } requestAnimationFrame(tick); }
+  sea.frame(offset); if(running) requestAnimationFrame(tick); else btn.textContent=(window.curLang&&curLang()==='en')?'Play':'Lecture';
+  btn.onclick=function(){ if(running){ offset=now(); running=false; btn.textContent=(curLang()==='en')?'Play':'Lecture'; } else { running=true; t0=performance.now(); btn.textContent='Pause'; requestAnimationFrame(tick); } };
+  var FR_LABELS={"Set back default parameters": "Remettre les réglages par défaut", "Lugia (default)": "Lugia (défaut)", "EVA sea": "Mer EVA", "Tropical": "Tropicale", "Stormy": "Tempête", "Timing & Motion": "Rythme et mouvement", "Wave Cycle Duration": "Durée d'un cycle (s)", "Phase Offset A": "Décalage vague A", "Phase Offset B": "Décalage vague B", "Phase Offset C": "Décalage vague C", "Recede Start": "Début du recul", "Recede Amount": "Amplitude du recul", "Dash Birth Start": "Début des pointillés", "Dash Birth Duration": "Durée des pointillés", "Surf Line Shape": "Forme de la vague", "Surf Band Width Scale": "Largeur de la bande", "Surf Band Trail Scale": "Longueur de la traîne", "Foam Band Width": "Épaisseur de l'écume", "Shoreline Warp Amplitude": "Ondulation (force)", "Shoreline Warp Scale": "Ondulation (taille)", "Cellular Veins": "Cellules d'écume", "Cell Pattern Type": "Type de motif", "Grid Size": "Nombre de cellules", "Line Width": "Épaisseur des traits", "Cell Repeat V": "Étirement", "Splash": "Éclaboussures", "Enable Splash": "Activer", "Splash Amount": "Quantité", "Splash Flicker Speed": "Vitesse de clignotement", "Wet Sand": "Sable mouillé", "Enable Wet Sand": "Activer", "Wet Sand Dry Duration": "Temps de séchage (s)", "Wet Sand Opacity": "Intensité", "Shadow": "Ombre", "Enable Shadow": "Activer", "Shadow Opacity": "Intensité", "Shadow Band Max Width": "Largeur max", "Colors": "Couleurs", "Water (shore)": "Eau (bord)", "Water (open sea)": "Eau (large)", "Foam Color": "Écume", "Beach Color": "Sable"};
+  function buildPanel(){ var root=document.getElementById('pg-panel'); root.innerHTML=''; OlmSea.panel(root, sea, {idPrefix:'pg', labels:(window.curLang&&curLang()==='en')?{}:FR_LABELS, onChange:function(){ if(!running) sea.frame(offset); }}); }
+  buildPanel(); addEventListener('langchange',function(){ buildPanel(); btn.textContent=running?'Pause':((curLang()==='en')?'Play':'Lecture'); });
+  if ('IntersectionObserver' in window) new IntersectionObserver(function(es){
+    var vis=es[0].isIntersecting;
+    if(!vis && running){ offset=now(); running=false; cv.dataset.auto='1'; }
+    else if(vis && cv.dataset.auto==='1'){ cv.dataset.auto=''; running=true; t0=performance.now(); requestAnimationFrame(tick); }
+  }).observe(cv);
+})();
+</script>
+
+<script>
+(function(){
+  var box=document.getElementById('stk'); if(!box) return;
+  var NAMES_FR=["Sable", "Sable mouillé", "Eau", "Cellules d'écume", "Ombre portée", "Ligne d'écume", "Éclaboussures"], NAMES_EN=["Sand","Wet sand","Water","Veins","Shadow","Foam band","Splashes"], NAMES=NAMES_FR, Q=[[0.4346, 0.0616], [0.9544, 0.3344], [0.6284, 0.9536], [0.0324, 0.4961]], N=7;
+  var REST=[]; for(var i=0;i<N;i++) REST.push((N-1-i)*0.105429);
+  var LH=0.367427;
+  var pls=[].slice.call(box.querySelectorAll('.pl')), tag=document.getElementById('ltag'), cur=null;
+  function state(h){ // returns per-layer dy (fraction of box height) and scale
+    var out=[]; for(var i=0;i<N;i++){ var dy=0,s=1;
+      if(h!=null){ if(i>h) dy=-0.10-0.012*(i-h); else if(i<h) dy=0.10+0.012*(h-i); else { dy=-0.01; s=1.5; } }
+      out.push([dy,s]); } return out; }
+  function apply(h){
+    var st=state(h), bh=box.clientHeight;
+    pls.forEach(function(p,i){ p.style.setProperty('--dy',(st[i][0]*bh)+'px'); p.style.setProperty('--s',st[i][1]); p.classList.toggle('on',i===h); });
+    if(h==null){ tag.classList.remove('on'); return; }
+    NAMES=(window.curLang&&curLang()==='en')?NAMES_EN:NAMES_FR; tag.textContent=NAMES[h];
+    tag.style.top=((REST[h]+st[h][0]+LH*Q[1][1])*100)+'%';
+    tag.classList.remove('on'); void tag.offsetWidth; tag.classList.add('on');
+  }
+  function inQuad(x,y){ // point-in-convex-quad
+    var s=0; for(var k=0;k<4;k++){ var a=Q[k], b=Q[(k+1)%4]; var c=(b[0]-a[0])*(y-a[1])-(b[1]-a[1])*(x-a[0]); if(c<0) return false; } return true; }
+  function hit(e){
+    var r=box.getBoundingClientRect(), x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height, st=state(cur);
+    for(var i=N-1;i>=0;i--){
+      var top=REST[i]+st[i][0], s=st[i][1];
+      var ly=(y-top)/LH, lx=x; // local coords in the layer image
+      lx=(lx-0.5)/s+0.5; ly=(ly-0.55)/s+0.55;
+      if(lx>=0&&lx<=1&&ly>=0&&ly<=1&&inQuad(lx,ly)) return i;
+    } return null;
+  }
+  function move(e){ var h=hit(e); if(h!==cur){ cur=h; apply(h); } }
+  box.addEventListener('pointermove',move);
+  box.addEventListener('pointerdown',move);
+  box.addEventListener('pointerleave',function(){ cur=null; apply(null); });
+  addEventListener('resize',function(){ apply(cur); });
+})();
+</script>
+<script>
+(function(){
+  // Safari / WebKit: load each video as a local blob (works even if the host refuses byte-range requests
+  // or sends the wrong content type), then play it when visible. Also start videos on the first interaction.
+  var ua=navigator.userAgent, WK=/AppleWebKit/.test(ua)&&!/Chrome\/|Chromium|Edg\/|Android|Firefox\//.test(ua);
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function vis(v){ var r=v.getBoundingClientRect(); return r.width>0&&r.bottom>0&&r.top<innerHeight; }
+  function go(v){ if(reduce||!v.paused||!vis(v)) return; v.muted=true; v.setAttribute('playsinline',''); var p=v.play(); if(p&&p.catch)p.catch(function(){}); }
+  function blobify(v){
+    if(v.__bl) return; var u=v.getAttribute('data-src')||v.getAttribute('src'); if(!u||/^blob:/.test(u)) return; v.__bl=1;
+    fetch(u).then(function(r){ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(function(buf){
+      var bu=URL.createObjectURL(new Blob([buf],{type:'video/mp4'}));
+      if(v.hasAttribute('data-src')) v.setAttribute('data-src',bu);
+      v.muted=true; v.setAttribute('playsinline',''); v.src=bu; go(v);
+    }).catch(function(){ v.__bl=0; });
+  }
+  if(WK&&'IntersectionObserver' in window&&window.fetch&&window.URL&&URL.createObjectURL){
+    var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) blobify(e.target); }); },{rootMargin:'400px 0px'});
+    function scan(){ [].forEach.call(document.querySelectorAll('video'),function(v){ if(!v.__io){ v.__io=1; io.observe(v); } }); }
+    scan(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',scan);
+  }
+  var t=0;
+  function kick(){ if(t) return; t=setTimeout(function(){t=0;},400); [].forEach.call(document.querySelectorAll('video'),function(v){ if(v.getAttribute('src')||v.currentSrc) go(v); }); }
+  ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){ addEventListener(ev,kick,{passive:true}); });
+})();
+</script>
+
+</body>
+</html>

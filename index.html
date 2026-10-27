@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>olmShoreline · Clémentine Garoche</title>
+<meta name="description" content="olmShoreline, a procedural toon shoreline shader for Maya and Arnold. R&D internship at OLM Digital, 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@600&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{--water:#22357a;--sand:#b8a786;--paper:#f2f4f7;--ink:#131d3b;--muted:#56627d;--line:#d6dce6;--panel:#fff;
+  --f-display:"Zen Maru Gothic","Arial Rounded MT Bold",system-ui,sans-serif;--f-body:"IBM Plex Sans",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root{--paper:#0b1330;--ink:#e7ecf6;--muted:#9ba8c4;--line:#24315a;--panel:#111c42;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16.5px/1.6 var(--f-body)}
+.hero{background:var(--water);color:#fff;padding:64px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
+.hero::after{content:"";display:block;height:28px;background:var(--sand);margin:48px calc(-1 * max(16px,env(safe-area-inset-left,0px))) 0}
+.in{max-width:1080px;margin:0 auto}
+.k{font:600 12px/1.4 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:#b9c8f2;margin:0 0 12px}
+h1{font:900 clamp(44px,8vw,86px)/.98 var(--f-display);margin:0 0 16px}
+h1 span{color:#c9e3ff}
+.lead{font-size:clamp(17px,2vw,20px);max-width:38em;color:#e3e9f9;margin:0}
+.hero video{width:100%;max-width:640px;border-radius:8px;display:block;margin-top:30px;background:#0e1a45}
+main{max-width:1080px;margin:0 auto;padding:48px max(16px,env(safe-area-inset-right,0px)) 72px max(16px,env(safe-area-inset-left,0px))}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:18px}
+.card{display:grid;gap:6px;padding:20px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:inherit;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 14px 28px -18px rgba(19,29,59,.5)}
+.card b{font:700 21px/1.2 var(--f-display)}
+.card span{color:var(--muted);font-size:15px}
+.card i{font:600 11px/1 var(--f-mono);font-style:normal;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+footer{color:var(--muted);font-size:14px;margin-top:40px}
+</style>
+</head>
+<body>
+<header class="hero"><div class="in">
+  <p class="k">R&amp;D internship · OLM Digital · April to October 2026</p>
+  <h1>olm<span>Shoreline</span></h1>
+  <p class="lead">A procedural toon shader for Maya and Arnold: three wave fronts breaking on a beach, built to look like hand-drawn anime water.</p>
+  <video src="media/b466276f61.mp4" poster="media/b466276f61.jpg" muted loop playsinline autoplay aria-label="olmShoreline default look"></video>
+</div></header>
+<main>
+  <div class="cards">
+    <a class="card" href="portfolio.html"><i>Portfolio</i><b>Breakdown boards</b><span>The project in ten animated 16:9 boards, in English and French.</span></a>
+    <a class="card" href="report.html"><i>Report</i><b>Internship report</b><span>From the first Bifrost tests to the final shader, with every figure.</span></a>
+    <a class="card" href="manual.html"><i>Manual</i><b>User manual</b><span>Every parameter illustrated, plus the full MEL code.</span></a>
+    <a class="card" href="presentation.html"><i>Slides</i><b>Presentation</b><span>The 26-slide internship presentation, with animations.</span></a>
+    <a class="card" href="famille.html"><i>FR / EN</i><b>Shoreline Shader</b><span>The general-audience version, with a live wave. En français et en anglais.</span></a>
+  </div>
+  <footer>Clémentine Garoche · Tech art / environment art · Montpellier</footer>
+</main>
+<script>
+(function(){
+  // Safari / WebKit: load each video as a local blob (works even if the host refuses byte-range requests
+  // or sends the wrong content type), then play it when visible. Also start videos on the first interaction.
+  var ua=navigator.userAgent, WK=/AppleWebKit/.test(ua)&&!/Chrome\/|Chromium|Edg\/|Android|Firefox\//.test(ua);
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function vis(v){ var r=v.getBoundingClientRect(); return r.width>0&&r.bottom>0&&r.top<innerHeight; }
+  function go(v){ if(reduce||!v.paused||!vis(v)) return; v.muted=true; v.setAttribute('playsinline',''); var p=v.play(); if(p&&p.catch)p.catch(function(){}); }
+  function blobify(v){
+    if(v.__bl) return; var u=v.getAttribute('data-src')||v.getAttribute('src'); if(!u||/^blob:/.test(u)) return; v.__bl=1;
+    fetch(u).then(function(r){ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(function(buf){
+      var bu=URL.createObjectURL(new Blob([buf],{type:'video/mp4'}));
+      if(v.hasAttribute('data-src')) v.setAttribute('data-src',bu);
+      v.muted=true; v.setAttribute('playsinline',''); v.src=bu; go(v);
+    }).catch(function(){ v.__bl=0; });
+  }
+  if(WK&&'IntersectionObserver' in window&&window.fetch&&window.URL&&URL.createObjectURL){
+    var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) blobify(e.target); }); },{rootMargin:'400px 0px'});
+    function scan(){ [].forEach.call(document.querySelectorAll('video'),function(v){ if(!v.__io){ v.__io=1; io.observe(v); } }); }
+    scan(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',scan);
+  }
+  var t=0;
+  function kick(){ if(t) return; t=setTimeout(function(){t=0;},400); [].forEach.call(document.querySelectorAll('video'),function(v){ if(v.getAttribute('src')||v.currentSrc) go(v); }); }
+  ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){ addEventListener(ev,kick,{passive:true}); });
+})();
+</script>
+</body>
+</html>
