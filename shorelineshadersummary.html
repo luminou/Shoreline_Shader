@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Shoreline Shader</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,6 +46,8 @@ p{max-width:64ch;text-wrap:pretty;margin:0 0 14px}
 .hero .lead{color:#e3e9f9;max-width:36em}
 .hero-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:44px;align-items:end}
 .live{margin:0;position:relative}
+.hvs{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 18px 40px -20px rgba(0,0,0,.6)}.hvs video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease}.hvs video.on{opacity:1}.hdots{display:inline-flex;gap:6px;align-items:center}.hdots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);transition:background .4s}.hdots i.on{background:#fff}
+
 .live canvas{display:block;width:100%;aspect-ratio:16/10;border-radius:8px 8px 0 0;background:#9e9784}
 .live figcaption{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 12.5px/1.4 var(--f-mono);color:#c6d1ee;padding:12px 0 18px}
 .live button{font:600 12px/1 var(--f-mono);color:#fff;background:transparent;border:1px solid rgba(255,255,255,.35);border-radius:99px;padding:7px 12px;cursor:pointer}
@@ -66,6 +68,16 @@ p{max-width:64ch;text-wrap:pretty;margin:0 0 14px}
 .shot figcaption{font-size:15px;line-height:1.5;color:var(--muted)}
 .shot figcaption b{display:block;color:var(--ink);font-family:var(--f-display);font-size:17px;margin-bottom:2px}
 .shot.wide{grid-column:span 2}
+.res-top{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:28px;margin-top:30px;align-items:start}
+.res-left{display:grid;gap:22px}
+.res-stack{display:grid;gap:10px;align-content:start;background:rgba(255,255,255,.35);border:1px solid var(--line);border-radius:10px;padding:20px 20px 34px}
+.res-stack .recipe-txt h3{margin:0 0 4px}.res-stack .recipe-txt p{margin:0 0 6px}
+.res-stack .stk{margin:26px auto 6px;max-width:215px}
+.res-stack .ltag{left:50%;margin-left:0;transform:translate(-50%,-50%) scale(.6)}.res-stack .ltag.on{transform:translate(-50%,-50%) scale(1)}
+.gallery.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.gallery.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gallery.g3 .shot>video,.gallery.g3 .vbox video{aspect-ratio:16/9;object-fit:contain;background:#fff}.gallery.g3{row-gap:30px}.gallery.g3 .pair video{aspect-ratio:8/9;object-fit:cover;background:#fff}
+@media (max-width:900px){.res-top{grid-template-columns:minmax(0,1fr)}.gallery.g3,.gallery.g2{grid-template-columns:minmax(0,1fr)}}
+
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .pair span{font:500 11.5px/1.3 var(--f-mono);color:var(--muted)}
 
@@ -232,17 +244,9 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
       <p class="kicker"><span class="l-en">R&amp;D internship · OLM Digital · April to October 2026</span><span class="l-fr">Stage R&amp;D · OLM Digital · avril à octobre 2026</span></p>
       <h1><span class="l-en">Hand-drawn <span>waves</span>, computed</span><span class="l-fr">Des vagues <span>dessinées</span>, calculées</span></h1>
       <p class="lead"><span class="l-en">Six months in the R&amp;D team of OLM Digital, the Japanese animation studio known for the Pokémon films, developing a procedural Maya shader that recreates hand-drawn anime water in 3D.</span><span class="l-fr">Six mois au sein de l'équipe R&amp;D d'OLM Digital, studio d'animation japonais connu pour les films Pokémon, à développer un shader procédural pour Maya qui reproduit en 3D l'eau dessinée à la main de l'animation japonaise.</span></p>
-      <ul class="legend">
-        <li><span class="dot" style="background:#fff"></span><span class="l-en">foam</span><span class="l-fr">écume</span></li>
-        <li><span class="dot" style="background:#22357a;box-shadow:0 0 0 1px #8ea2df"></span><span class="l-en">water</span><span class="l-fr">eau</span></li>
-        <li><span class="dot" style="background:#b8a786"></span><span class="l-en">sand</span><span class="l-fr">sable</span></li>
-        <li><span class="dot" style="background:#6f6a5c"></span><span class="l-en">wet sand</span><span class="l-fr">sable mouillé</span></li>
-      </ul>
+      
     </div>
-    <figure class="live">
-      <canvas id="sea" width="384" height="240" aria-label="Three waves reaching a beach, computed live"></canvas>
-      <figcaption><span><span class="l-en">Computed live in the browser with the same formula as the tool (simplified).</span><span class="l-fr">Calculé en direct dans le navigateur avec la même formule que l'outil (version simplifiée).</span></span><button type="button" id="pause">Pause</button></figcaption>
-    </figure>
+    <figure class="live hero-renders"><div class="hvs"><video autoplay loop muted playsinline class="hv on" webkit-playsinline preload="auto" poster="media/b466276f61.jpg" aria-label="Default look"><source src="media/b466276f61.mp4" type="video/mp4"></video><video autoplay loop muted playsinline class="hv" webkit-playsinline preload="auto" poster="media/a069b55946.jpg" aria-label="Turquoise look"><source src="media/a069b55946.mp4" type="video/mp4"></video><video autoplay loop muted playsinline class="hv" webkit-playsinline preload="auto" poster="media/4608fa0e4c.jpg" aria-label="Red sea look"><source src="media/4608fa0e4c.mp4" type="video/mp4"></video></div><figcaption><span><span class="l-en">Renders from the tool: default look, tropical sea, red sea.</span><span class="l-fr">Rendus de l'outil : réglages par défaut, mer tropicale, mer rouge.</span></span><span class="hdots" aria-hidden="true"><i class="on"></i><i></i><i></i></span></figcaption></figure>
   </div>
   <div class="shore" aria-hidden="true"></div>
 </header>
@@ -258,10 +262,10 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
   <div class="wrap compare">
     <h3><span class="l-en">The reference, then the tool</span><span class="l-fr">La référence, puis l'outil</span></h3>
     <div class="cmp-grid">
-      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/d08172bb29.jpg" src="media/d08172bb29.mp4" aria-label="Pokémon reference"></video><figcaption><b><span class="l-en">Reference</span><span class="l-fr">Référence</span></b><span class="l-en">Pokémon (Lugia, 1999): hand-animated waves.</span><span class="l-fr">Pokémon (Lugia, 1999) : vagues animées à la main.</span></figcaption></figure>
-      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/b466276f61.jpg" src="media/b466276f61.mp4" aria-label="Default look"></video><figcaption><b><span class="l-en">The tool</span><span class="l-fr">L'outil</span></b><span class="l-en">Tool render, default settings.</span><span class="l-fr">Rendu de l'outil, réglages par défaut.</span></figcaption></figure>
-      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/8f78d8c398.jpg" src="media/8f78d8c398.mp4" aria-label="Evangelion reference"></video><figcaption><b><span class="l-en">Reference</span><span class="l-fr">Référence</span></b><span class="l-en"><i>The End of Evangelion</i> (1997) and its red sea.</span><span class="l-fr"><i>The End of Evangelion</i> (1997) et sa mer rouge.</span></figcaption></figure>
-      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/4608fa0e4c.jpg" src="media/4608fa0e4c.mp4" aria-label="Red sea look"></video><figcaption><b><span class="l-en">The tool</span><span class="l-fr">L'outil</span></b><span class="l-en">Same tool, different settings.</span><span class="l-fr">Le même outil, d'autres réglages.</span></figcaption></figure>
+      <figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/d08172bb29.jpg" aria-label="Pokémon reference"><source src="media/d08172bb29.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Reference</span><span class="l-fr">Référence</span></b><span class="l-en">Pokémon (Lugia, 1999): hand-animated waves.</span><span class="l-fr">Pokémon (Lugia, 1999) : vagues animées à la main.</span></figcaption></figure>
+      <figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/b466276f61.jpg" aria-label="Default look"><source src="media/b466276f61.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">The tool</span><span class="l-fr">L'outil</span></b><span class="l-en">Tool render, default settings.</span><span class="l-fr">Rendu de l'outil, réglages par défaut.</span></figcaption></figure>
+      <figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/8f78d8c398.jpg" aria-label="Evangelion reference"><source src="media/8f78d8c398.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Reference</span><span class="l-fr">Référence</span></b><span class="l-en"><i>The End of Evangelion</i> (1997) and its red sea.</span><span class="l-fr"><i>The End of Evangelion</i> (1997) et sa mer rouge.</span></figcaption></figure>
+      <figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4608fa0e4c.jpg" aria-label="Red sea look"><source src="media/4608fa0e4c.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">The tool</span><span class="l-fr">L'outil</span></b><span class="l-en">Same tool, different settings.</span><span class="l-fr">Le même outil, d'autres réglages.</span></figcaption></figure>
     </div>
   </div>
 </section>
@@ -271,24 +275,13 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
     <p class="kicker"><span class="l-en">The result</span><span class="l-fr">Le résultat</span></p>
     <h2><span class="l-en">One tool, many seas</span><span class="l-fr">Un outil, de nombreuses mers</span></h2>
     <p class="lead"><span class="l-en">Everything can be adjusted: wave speed, water color, the shape of the foam cells, splashes, how fast the sand dries.</span><span class="l-fr">Tout est réglable : vitesse des vagues, couleur de l'eau, forme des cellules d'écume, éclaboussures, séchage du sable.</span></p>
-    <div class="gallery">
-      <figure class="shot wide"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/b466276f61.jpg" src="media/b466276f61.mp4" aria-label="Final render"></video><figcaption><b><span class="l-en">Final render</span><span class="l-fr">Rendu final</span></b><span class="l-en">Three waves come in, appear as dashes, merge into a foam line, then pull back and leave wet sand behind.</span><span class="l-fr">Trois vagues arrivent, apparaissent en pointillés, forment une ligne d'écume, puis reculent en laissant le sable mouillé.</span></figcaption></figure>
-      <figure class="shot"><div class="vbox"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/d659c91150.jpg" src="media/d659c91150.mp4" aria-label="Debug view of fronts A, B, C"></video><img class="legend-inset" src="media/30fc14f070.webp" alt="A magenta, B cyan, C yellow"></div><figcaption><b><span class="l-en">Three waves</span><span class="l-fr">Trois vagues</span></b><span class="l-en">Debug view: each color is one wave (A magenta, B cyan, C yellow). They follow the same rules, offset in time, so the sea never looks like one repeating wave.</span><span class="l-fr">Vue de debug : chaque couleur est une vague (A magenta, B cyan, C jaune). Elles suivent les mêmes règles, décalées dans le temps, pour que la mer ne ressemble jamais à une seule vague qui se répète.</span></figcaption></figure>
-      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/a069b55946.jpg" src="media/a069b55946.mp4" aria-label="Turquoise look"></video><figcaption><b><span class="l-en">Tropical sea</span><span class="l-fr">Mer tropicale</span></b><span class="l-en">Turquoise gradient water, obtained through settings only.</span><span class="l-fr">Eau turquoise en dégradé, obtenue uniquement par les réglages.</span></figcaption></figure>
-      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/4608fa0e4c.jpg" src="media/4608fa0e4c.mp4" aria-label="Red sea look"></video><figcaption><b><span class="l-en">Red sea</span><span class="l-fr">Mer rouge</span></b><span class="l-en">A nod to the sea in <i>Evangelion</i>.</span><span class="l-fr">Un clin d'œil à la mer d'<i>Evangelion</i>.</span></figcaption></figure>
-      <figure class="shot"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/4d5ac73766.jpg" src="media/4d5ac73766.mp4" aria-label="Height displacement"></video><figcaption><b><span class="l-en">With relief</span><span class="l-fr">Avec relief</span></b><span class="l-en">Optional height displacement gives the wave some relief.</span><span class="l-fr">En option, un déplacement en hauteur donne du relief à la vague.</span></figcaption></figure>
-      <figure class="shot"><div class="pair"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/b466276f61.jpg" src="media/b466276f61.mp4" aria-label="Phase offset A 0.6, B 0.2, C 0"></video><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/e16c806568.jpg" src="media/e16c806568.mp4" aria-label="Phase offset A 0.4, B 0.5, C 0.3"></video></div><figcaption><b><span class="l-en">Phase offset</span><span class="l-fr">Décalage des vagues</span></b><span class="l-en">The same three waves, staggered differently in time.</span><span class="l-fr">Les trois mêmes vagues, échelonnées autrement dans le temps.</span></figcaption></figure>
-      <figure class="shot"><div class="pair"><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/196bc9a43a.jpg" src="media/196bc9a43a.mp4" aria-label="Wet sand dries in 2 s"></video><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/9baa1ec524.jpg" src="media/9baa1ec524.mp4" aria-label="Wet sand dries in 5 s"></video><span><span class="l-en">dries in 2 s</span><span class="l-fr">sèche en 2 s</span></span><span><span class="l-en">dries in 5 s</span><span class="l-fr">sèche en 5 s</span></span></div><figcaption><b><span class="l-en">Wet sand</span><span class="l-fr">Sable mouillé</span></b><span class="l-en">The dark trace left by the water dries at the chosen speed.</span><span class="l-fr">La trace sombre laissée par l'eau sèche à la vitesse choisie.</span></figcaption></figure>
-    </div>
-    <div class="recipe">
-      <div class="recipe-txt">
+    <div class="res-top"><div class="res-left"><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/b466276f61.jpg" aria-label="Final render"><source src="media/b466276f61.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Final render</span><span class="l-fr">Rendu final</span></b><span class="l-en">Three waves come in, appear as dashes, merge into a foam line, then pull back and leave wet sand behind.</span><span class="l-fr">Trois vagues arrivent, apparaissent en pointillés, forment une ligne d'écume, puis reculent en laissant le sable mouillé.</span></figcaption></figure></div><div class="res-stack"><div class="recipe-txt">
         <h3><span class="l-en">One image, seven layers</span><span class="l-fr">Une image, sept couches</span></h3>
         <p><span class="l-en">The final image stacks seven layers, like layers in a painting program. Each has its own mask, which defines where it appears.</span><span class="l-fr">L'image finale superpose sept couches, comme des calques. Chacune a son propre masque, qui définit où elle apparaît.</span></p>
         <p class="recipe-hint"><span class="l-en">Hover a layer to bring it forward.</span><span class="l-fr">Survolez une couche pour la faire ressortir.</span></p>
-      </div>
-      <div class="stk" id="stk" role="img" aria-label="Seven stacked layers"><img class="pl" data-i="0" src="media/layer_sand.webp" alt="" style="top:63.257%;z-index:1" draggable="false"><img class="pl" data-i="1" src="media/layer_wet.webp" alt="" style="top:52.714%;z-index:2" draggable="false"><img class="pl" data-i="2" src="media/layer_water.webp" alt="" style="top:42.172%;z-index:3" draggable="false"><img class="pl" data-i="3" src="media/layer_veins.webp" alt="" style="top:31.629%;z-index:4" draggable="false"><img class="pl" data-i="4" src="media/layer_shadow.webp" alt="" style="top:21.086%;z-index:5" draggable="false"><img class="pl" data-i="5" src="media/layer_foam.webp" alt="" style="top:10.543%;z-index:6" draggable="false"><img class="pl" data-i="6" src="media/layer_splash.webp" alt="" style="top:0.000%;z-index:7" draggable="false">
+      </div><div class="stk" id="stk" role="img" aria-label="Seven stacked layers"><img class="pl" data-i="0" src="media/layer_sand.webp" alt="" style="top:63.257%;z-index:1" draggable="false"><img class="pl" data-i="1" src="media/layer_wet.webp" alt="" style="top:52.714%;z-index:2" draggable="false"><img class="pl" data-i="2" src="media/layer_water.webp" alt="" style="top:42.172%;z-index:3" draggable="false"><img class="pl" data-i="3" src="media/layer_veins.webp" alt="" style="top:31.629%;z-index:4" draggable="false"><img class="pl" data-i="4" src="media/layer_shadow.webp" alt="" style="top:21.086%;z-index:5" draggable="false"><img class="pl" data-i="5" src="media/layer_foam.webp" alt="" style="top:10.543%;z-index:6" draggable="false"><img class="pl" data-i="6" src="media/layer_splash.webp" alt="" style="top:0.000%;z-index:7" draggable="false">
         <span class="ltag" id="ltag"></span></div>
-    </div>
+    </div></div><div class="gallery g3"><figure class="shot"><div class="vbox"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/d659c91150.jpg" aria-label="Debug view of fronts A, B, C"><source src="media/d659c91150.mp4" type="video/mp4"></video><img class="legend-inset" src="media/30fc14f070.webp" alt="A magenta, B cyan, C yellow"></div><figcaption><b><span class="l-en">Three waves</span><span class="l-fr">Trois vagues</span></b><span class="l-en">Debug view: each color is one wave.</span><span class="l-fr">Vue de debug : chaque couleur est une vague.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/a069b55946.jpg" aria-label="Turquoise look"><source src="media/a069b55946.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Tropical sea</span><span class="l-fr">Mer tropicale</span></b><span class="l-en">Turquoise gradient water, obtained through settings only.</span><span class="l-fr">Eau turquoise en dégradé, obtenue uniquement par les réglages.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4608fa0e4c.jpg" aria-label="Red sea look"><source src="media/4608fa0e4c.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">Red sea</span><span class="l-fr">Mer rouge</span></b><span class="l-en">A nod to the sea in <i>Evangelion</i>.</span><span class="l-fr">Un clin d'œil à la mer d'<i>Evangelion</i>.</span></figcaption></figure><figure class="shot"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/4d5ac73766.jpg" aria-label="Height displacement"><source src="media/4d5ac73766.mp4" type="video/mp4"></video><figcaption><b><span class="l-en">With relief</span><span class="l-fr">Avec relief</span></b><span class="l-en">Optional height displacement gives the wave some relief.</span><span class="l-fr">En option, un déplacement en hauteur donne du relief à la vague.</span></figcaption></figure><figure class="shot"><div class="pair"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/b466276f61.jpg" aria-label="Phase offset A 0.6, B 0.2, C 0"><source src="media/b466276f61.mp4" type="video/mp4"></video><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/e16c806568.jpg" aria-label="Phase offset A 0.4, B 0.5, C 0.3"><source src="media/e16c806568.mp4" type="video/mp4"></video></div><figcaption><b><span class="l-en">Phase offset</span><span class="l-fr">Décalage des vagues</span></b><span class="l-en">The same three waves, staggered differently in time.</span><span class="l-fr">Les trois mêmes vagues, échelonnées autrement dans le temps.</span></figcaption></figure><figure class="shot"><div class="pair"><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/196bc9a43a.jpg" aria-label="Wet sand dries in 2 s"><source src="media/196bc9a43a.mp4" type="video/mp4"></video><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/9baa1ec524.jpg" aria-label="Wet sand dries in 5 s"><source src="media/9baa1ec524.mp4" type="video/mp4"></video><span><span class="l-en">dries in 2 s</span><span class="l-fr">sèche en 2 s</span></span><span><span class="l-en">dries in 5 s</span><span class="l-fr">sèche en 5 s</span></span></div><figcaption><b><span class="l-en">Wet sand</span><span class="l-fr">Sable mouillé</span></b><span class="l-en">The dark trace left by the water dries at the chosen speed.</span><span class="l-fr">La trace sombre laissée par l'eau sèche à la vitesse choisie.</span></figcaption></figure></div>
   </div>
 </section>
 
@@ -298,10 +291,10 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
     <h2><span class="l-en">From first tests to the final tool</span><span class="l-fr">Des premiers tests à l'outil final</span></h2>
     <p class="lead"><span class="l-en">The first approach relied on a physical simulation of the sea. It was later replaced by a fully procedural system driven by formulas.</span><span class="l-fr">La première approche reposait sur une simulation physique de la mer. Elle a ensuite été remplacée par un système entièrement procédural, piloté par des formules.</span></p>
     <ol class="steps">
-      <li><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/b352206789.jpg" src="media/b352206789.mp4" aria-label="First deformation test"></video><span class="when"><span class="l-en">April</span><span class="l-fr">Avril</span></span><p><span class="l-en">First tests in Bifrost: a rippled surface and foam spots.</span><span class="l-fr">Premiers tests dans Bifrost : surface ondulée et taches d'écume.</span></p></li>
-      <li><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/76c33f80b8.jpg" src="media/76c33f80b8.mp4" aria-label="Swell simulation"></video><span class="when"><span class="l-en">May</span><span class="l-fr">Mai</span></span><p><span class="l-en">A BOSS swell simulation, overlaid with a cellular pattern.</span><span class="l-fr">Simulation de houle avec BOSS, recouverte d'un motif cellulaire.</span></p></li>
-      <li><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/d0b16d6fdd.jpg" src="media/d0b16d6fdd.mp4" aria-label="Three wave lines"></video><span class="when"><span class="l-en">June</span><span class="l-fr">Juin</span></span><p><span class="l-en">The turning point: three wave fronts driven by a formula.</span><span class="l-fr">Le tournant : trois fronts de vagues pilotés par une formule.</span></p></li>
-      <li><video muted loop playsinline webkit-playsinline autoplay preload="metadata" poster="media/b466276f61.jpg" src="media/b466276f61.mp4" aria-label="Final render"></video><span class="when"><span class="l-en">September</span><span class="l-fr">Septembre</span></span><p><span class="l-en">The final tool and its manual, presented to the studio's teams.</span><span class="l-fr">L'outil final et son manuel, présentés aux équipes du studio.</span></p></li>
+      <li><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/b352206789.jpg" aria-label="First deformation test"><source src="media/b352206789.mp4" type="video/mp4"></video><span class="when"><span class="l-en">April</span><span class="l-fr">Avril</span></span><p><span class="l-en">First tests in Bifrost: a rippled surface and foam spots.</span><span class="l-fr">Premiers tests dans Bifrost : surface ondulée et taches d'écume.</span></p></li>
+      <li><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/76c33f80b8.jpg" aria-label="Swell simulation"><source src="media/76c33f80b8.mp4" type="video/mp4"></video><span class="when"><span class="l-en">May</span><span class="l-fr">Mai</span></span><p><span class="l-en">A BOSS swell simulation, overlaid with a cellular pattern.</span><span class="l-fr">Simulation de houle avec BOSS, recouverte d'un motif cellulaire.</span></p></li>
+      <li><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/d0b16d6fdd.jpg" aria-label="Three wave lines"><source src="media/d0b16d6fdd.mp4" type="video/mp4"></video><span class="when"><span class="l-en">June</span><span class="l-fr">Juin</span></span><p><span class="l-en">The turning point: three wave fronts driven by a formula.</span><span class="l-fr">Le tournant : trois fronts de vagues pilotés par une formule.</span></p></li>
+      <li><video autoplay loop muted playsinline webkit-playsinline preload="metadata" poster="media/b466276f61.jpg" aria-label="Final render"><source src="media/b466276f61.mp4" type="video/mp4"></video><span class="when"><span class="l-en">September</span><span class="l-fr">Septembre</span></span><p><span class="l-en">The final tool and its manual, presented to the studio's teams.</span><span class="l-fr">L'outil final et son manuel, présentés aux équipes du studio.</span></p></li>
     </ol>
     <figure class="strip">
       <img src="media/cells_strip.webp" alt="Foam cell pattern iterations" loading="lazy">
@@ -432,7 +425,7 @@ Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">
   <div class="wrap"><span class="l-en">Clémentine Garoche · VFX R&amp;D internship at OLM Digital, 2026 · olmShoreline tool for Maya and Arnold. Images are renders from the tool, except the film excerpts shown as references.</span><span class="l-fr">Clémentine Garoche · stage R&amp;D VFX chez OLM Digital, 2026 · outil olmShoreline pour Maya et Arnold. Les images sont des rendus de l'outil, sauf les extraits de films montrés comme références.</span></div>
 </footer>
 
-<script>
+<script>window.__lz=function(v){ var s=v.querySelector('source[data-src]'); if(s&&!s.getAttribute('src')){ s.setAttribute('src',s.getAttribute('data-src')); v.muted=true; v.load(); } };</script><script>
 (function(){
   var KEY='olmShoreline-lang', DEF='fr';
   function get(){ try{ return localStorage.getItem(KEY)||DEF; }catch(e){ return DEF; } }
@@ -475,7 +468,7 @@ Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">
   function farthest(rs, ra){ var best=9, tb=0; for(var i=0;i<=400;i++){ var t=i/400, x=frontPos(t,rs,ra); if(x<best){best=x;tb=t;} } return {x:best,t:tb}; }
 
   /* ---------- live canvas ---------- */
-  var cv=document.getElementById('sea'), ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+  var cv=document.getElementById('sea')||document.createElement('canvas'), ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
   var img=ctx.createImageData(W,H), D=img.data;
   function hash(x,y,s){ var h=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453; return h-Math.floor(h); }
   function vnoise(x,s){ var i=Math.floor(x), f=x-i, u=f*f*(3-2*f); return hash(i,0,s)*(1-u)+hash(i+1,0,s)*u; }
@@ -538,7 +531,7 @@ Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">
     }
     ctx.putImageData(img,0,0);
   }
-  var running=!reduce, t0=performance.now(), offset=6, last=0, btn=document.getElementById('pause');
+  var running=!reduce&&!!document.getElementById('sea'), t0=performance.now(), offset=6, last=0, btn=document.getElementById('pause')||document.createElement('button');
   function loop(now){
     if (!running) return;
     if (now-last>40){ last=now; frame(offset+(now-t0)/1000); }
@@ -888,11 +881,15 @@ window.OlmSea = (function(){
   function vis(v){ var r=v.getBoundingClientRect(); return r.width>0&&r.bottom>0&&r.top<innerHeight; }
   function go(v){ if(reduce||!v.paused||!vis(v)) return; v.muted=true; v.setAttribute('playsinline',''); var p=v.play(); if(p&&p.catch)p.catch(function(){}); }
   function blobify(v){
-    if(v.__bl) return; var u=v.getAttribute('data-src')||v.getAttribute('src'); if(!u||/^blob:/.test(u)) return; v.__bl=1;
+    if(v.__bl) return; var s=v.querySelector('source');
+    var u=s?(s.getAttribute('src')||s.getAttribute('data-src')):(v.getAttribute('data-src')||v.getAttribute('src'));
+    if(!u||/^blob:/.test(u)) return; v.__bl=1;
     fetch(u).then(function(r){ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(function(buf){
       var bu=URL.createObjectURL(new Blob([buf],{type:'video/mp4'}));
-      if(v.hasAttribute('data-src')) v.setAttribute('data-src',bu);
-      v.muted=true; v.setAttribute('playsinline',''); v.src=bu; go(v);
+      v.muted=true; v.setAttribute('playsinline','');
+      if(s){ if(s.hasAttribute('data-src')) s.setAttribute('data-src',bu); s.setAttribute('src',bu); v.load(); }
+      else { if(v.hasAttribute('data-src')) v.setAttribute('data-src',bu); v.src=bu; }
+      go(v);
     }).catch(function(){ v.__bl=0; });
   }
   if(WK&&'IntersectionObserver' in window&&window.fetch&&window.URL&&URL.createObjectURL){
@@ -901,10 +898,21 @@ window.OlmSea = (function(){
     scan(); if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',scan);
   }
   var t=0;
-  function kick(){ if(t) return; t=setTimeout(function(){t=0;},400); [].forEach.call(document.querySelectorAll('video'),function(v){ if(v.getAttribute('src')||v.currentSrc) go(v); }); }
+  function kick(){ if(t) return; t=setTimeout(function(){t=0;},400); [].forEach.call(document.querySelectorAll('video'),function(v){ if(v.currentSrc||v.querySelector('source[src]')) go(v); }); }
   ['pointerdown','touchstart','keydown','scroll'].forEach(function(ev){ addEventListener(ev,kick,{passive:true}); });
 })();
 </script>
 
+<script>
+(function(){
+  var vs=[].slice.call(document.querySelectorAll('.hvs video')), dots=[].slice.call(document.querySelectorAll('.hdots i')), k=0;
+  if(vs.length<2) return;
+  setInterval(function(){
+    var n=(k+1)%vs.length, v=vs[n];
+    try{ v.currentTime=0; }catch(e){} var p=v.play(); if(p&&p.catch)p.catch(function(){});
+    vs[k].classList.remove('on'); v.classList.add('on'); dots[k]&&dots[k].classList.remove('on'); dots[n]&&dots[n].classList.add('on'); k=n;
+  },6000);
+})();
+</script>
 </body>
 </html>
