@@ -20,7 +20,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font:400 16.5px/1.6 var(-
 h1{font:900 clamp(44px,8vw,86px)/.98 var(--f-display);margin:0 0 16px}
 h1 span{color:#c9e3ff}
 .lead{font-size:clamp(17px,2vw,20px);max-width:38em;color:#e3e9f9;margin:0}
-.hero video{width:100%;max-width:640px;border-radius:8px;display:block;margin-top:30px;background:#0e1a45}
+.hero video{width:100%;max-width:560px;aspect-ratio:7/5;object-fit:cover;background:#fff;border-radius:8px;display:block;margin-top:30px;background:#0e1a45}
 main{max-width:1080px;margin:0 auto;padding:48px max(16px,env(safe-area-inset-right,0px)) 72px max(16px,env(safe-area-inset-left,0px))}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:18px}
 .card{display:grid;gap:6px;padding:20px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:inherit;text-decoration:none;transition:transform .2s,box-shadow .2s}
@@ -36,15 +36,15 @@ footer{color:var(--muted);font-size:14px;margin-top:40px}
   <p class="k">R&amp;D internship · OLM Digital · April to October 2026</p>
   <h1>olm<span>Shoreline</span></h1>
   <p class="lead">A procedural toon shader for Maya and Arnold: three wave fronts breaking on a beach, built to look like hand-drawn anime water.</p>
-  <video autoplay loop muted playsinline poster="media/b466276f61.jpg" aria-label="olmShoreline default look"><source src="media/b466276f61.mp4" type="video/mp4"></video>
+  <video autoplay loop muted playsinline poster="media/b466276f61r.jpg" aria-label="olmShoreline default look"><source src="media/b466276f61r.mp4" type="video/mp4"></video>
 </div></header>
 <main>
   <div class="cards">
-    <a class="card" href="portfolio.html"><i>Portfolio</i><b>Breakdown boards</b><span>The project in ten animated 16:9 boards, in English and French.</span></a>
+    <a class="card" href="shorelineshadersummary.html"><i>FR / EN</i><b>Shoreline Shader</b><span>The general-audience summary, with a live wave. In English and French.</span></a>
+    <a class="card" href="portfolio.html"><i>Portfolio</i><b>Breakdown boards</b><span>The project in eleven animated 16:9 boards.</span></a>
     <a class="card" href="report.html"><i>Report · 🔒</i><b>Internship report</b><span>From the first Bifrost tests to the final shader, with every figure.</span></a>
     <a class="card" href="manual.html"><i>Manual · 🔒</i><b>User manual</b><span>Every parameter illustrated, plus the full MEL code.</span></a>
     <a class="card" href="presentation.html"><i>Slides · 🔒</i><b>Presentation</b><span>The 26-slide internship presentation, with animations.</span></a>
-    <a class="card" href="shorelineshadersummary.html"><i>FR / EN</i><b>Shoreline Shader</b><span>The general-audience summary, with a live wave. In English and French.</span></a>
   </div>
   <footer>Clémentine Garoche · Tech art / environment art · Montpellier</footer>
 </main>
