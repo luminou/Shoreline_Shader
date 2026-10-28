@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta charset="utf-8"><script>(function(){try{var t=localStorage.getItem('olm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>*,*::before,*::after{box-sizing:border-box}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Shoreline Shader</title>
@@ -945,5 +945,28 @@ window.OlmSea = (function(){
   auto();
 })();
 </script>
+<style>
+.thm{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:9999;display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--panel,#fff);border:1px solid var(--line,#d6dce6);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.thm button{all:unset;cursor:pointer;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--muted,#56627d);transition:background .2s,color .2s}
+.thm button:hover{color:var(--ink,#131d3b)}
+.thm button:focus-visible{outline:2px solid var(--accent,#3b5bd6);outline-offset:1px}
+.thm button.on{background:var(--ink,#131d3b);color:var(--paper,#fff)}
+.thm svg{width:17px;height:17px;display:block}
+@media print{.thm{display:none}}
+</style>
+<div class="thm" role="group" aria-label="Theme">
+<button type="button" data-t="light" aria-label="Light theme / Thème clair" title="Light / Clair"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+<button type="button" data-t="dark" aria-label="Dark theme / Thème sombre" title="Dark / Sombre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg></button>
+</div>
+<script>(function(){
+  var root=document.documentElement, mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null, bs=document.querySelectorAll('.thm button');
+  function cur(){ var a=root.getAttribute('data-theme'); return a==='light'||a==='dark'?a:(mq&&mq.matches?'dark':'light'); }
+  function paint(){ var c=cur(); [].forEach.call(bs,function(b){ var on=b.getAttribute('data-t')===c; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }); }
+  [].forEach.call(bs,function(b){ b.addEventListener('click',function(){ var t=b.getAttribute('data-t');
+    root.setAttribute('data-theme',t); try{localStorage.setItem('olm-theme',t);}catch(e){}
+    paint(); try{ window.dispatchEvent(new Event('olm-theme')); if(window.__fxRedraw) window.__fxRedraw(); }catch(e){} }); });
+  if(mq&&mq.addEventListener) mq.addEventListener('change',paint);
+  paint();
+})();</script>
 </body>
 </html>
