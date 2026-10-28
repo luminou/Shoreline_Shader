@@ -107,6 +107,7 @@ p{max-width:64ch;text-wrap:pretty;margin:0 0 14px}
 .ctrl output{font:600 13px/1 var(--f-mono);color:var(--accent)}
 .ctrl input[type=range]{width:100%;accent-color:var(--accent)}
 .ctrl .hint{font-size:14px;color:var(--muted);margin:0}
+.fv1{margin:0}.fv1 video,.fv1 img.vfb{width:100%!important;height:auto!important;aspect-ratio:728/496;display:block;border-radius:8px;background:#fff}.fv1 figcaption{font-size:13px;color:var(--muted);margin-top:6px}
 
 /* code */
 .codegrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:30px;align-items:start;margin-top:22px}
@@ -323,6 +324,7 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
     <div class="play">
       <svg id="plot" viewBox="0 0 600 316" role="img" aria-label="Wave position over one cycle"></svg>
       <div class="ctrl">
+        <figure class="fv1"><video autoplay loop muted playsinline webkit-playsinline preload="auto" poster="media/front1.jpg" aria-label="Single front over one cycle"><source src="media/front1.mp4" type="video/mp4"></video><figcaption><span class="l-en">One front, one cycle (default settings). The dot on the curve follows this render.</span><span class="l-fr">Un front, un cycle (réglages par défaut). Le point de la courbe suit ce rendu.</span></figcaption></figure>
         <label for="rs"><span><span class="l-en">Recede Start t<sub>r</sub></span><span class="l-fr">Début du recul t<sub>r</sub></span> <output id="rsv">0.55</output></span><input type="range" id="rs" min="0.3" max="0.85" step="0.01" value="0.55"></label>
         <label for="ra"><span><span class="l-en">Recede Amount R</span><span class="l-fr">Amplitude du recul R</span> <output id="rav">0.35</output></span><input type="range" id="ra" min="0" max="0.7" step="0.01" value="0.35"></label>
         <p class="hint"><span class="l-en">Move the sliders: the curve, the moving dot and the beach strip update. The dashed line marks the recede start, the pink arrow the recede amount, and the yellow dot the farthest point reached, where the wet sand begins.</span><span class="l-fr">Déplacez les curseurs : la courbe, le point mobile et la bande de plage se mettent à jour. La ligne pointillée marque le début du recul, la flèche rose l'amplitude du recul, et le point jaune l'endroit le plus loin atteint, où commence le sable mouillé.</span></p>
@@ -641,7 +643,12 @@ Surf_line_mask_A.ramp[<span class="n">1</span>].ramp_Position = <span class="v">
   window.__fxRedraw=function(){ draw(rsv(),rav(),pt); };
   upd();
   if (!reduce){
-    (function anim(now){ pt=(pt+(now-pl)/6000)%1; pl=now; draw(rsv(),rav(),pt); requestAnimationFrame(anim); })(performance.now());
+    var fv=document.querySelector('.fv1 video'), T0=4.77, CYC=12, ft0=performance.now();
+    function fr(x){ return ((x%1)+1)%1; }
+    (function anim(now){
+      if(fv&&fv.readyState>=2&&!fv.paused&&fv.style.display!=='none') pt=fr((fv.currentTime-T0)/CYC);
+      else if(!fv||fv.style.display==='none') pt=fr(((now-ft0)/1000-T0)/CYC);
+      pl=now; draw(rsv(),rav(),pt); requestAnimationFrame(anim); })(performance.now());
   }
 })();
 </script>
