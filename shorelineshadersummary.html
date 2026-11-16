@@ -238,7 +238,6 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
 </head>
 <body>
 
-
 <header class="hero">
   <div class="wrap hero-top"><a class="home-link" href="./">&#8592; <span class="l-en">Home</span><span class="l-fr">Accueil</span></a><div class="lang" role="group" aria-label="Language / Langue"><button type="button" data-set-l="fr" lang="fr" aria-label="Français"><svg viewBox="0 0 3 2" aria-hidden="true"><rect width="1" height="2" fill="#0055a4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ef4135"/></svg><span>FR</span></button><button type="button" data-set-l="en" lang="en" aria-label="English"><svg viewBox="0 0 60 30" aria-hidden="true"><clipPath id="uk-c"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#uk-c)" stroke="#C8102E" stroke-width="4"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg><span>EN</span></button></div></div>
   <div class="wrap hero-grid">
@@ -253,7 +252,23 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
   <div class="shore" aria-hidden="true"></div>
 </header>
 
-<section class="band">
+<section class="band" id="jouer">
+  <div class="wrap">
+    <p class="kicker"><span class="l-en">Try it</span><span class="l-fr">À essayer</span></p>
+    <h2><span class="l-en">The real settings, live</span><span class="l-fr">Les vrais réglages, en direct</span></h2>
+    <p class="lead"><span class="l-en">These sliders mirror the settings of the tool's panel in Maya and update the sea in real time. Presets are also available.</span><span class="l-fr">Ces curseurs reprennent les réglages du panneau de l'outil dans Maya et modifient la mer en temps réel. Des préréglages sont aussi disponibles.</span></p>
+    <div class="play-grid fam">
+      <div class="play-stage">
+        <canvas id="pg" width="576" height="324" aria-label="Live beach driven by the settings"></canvas>
+        <div class="play-bar"><button type="button" class="ae-btn" id="pg-play">Pause</button><span class="hint-s"><span class="l-en">Simplified version running in the browser. The real render is made in Maya with Arnold.</span><span class="l-fr">Version simplifiée qui tourne dans le navigateur. Le vrai rendu est fait dans Maya avec Arnold.</span></span></div>
+      </div>
+      <div class="ae" id="pg-panel" aria-label="Settings panel"></div>
+    </div>
+  
+  </div>
+</section>
+
+<section class="band sand">
   <div class="wrap">
     <p class="kicker"><span class="l-en">The starting point</span><span class="l-fr">Le point de départ</span></p>
     <h2><span class="l-en">In anime, every wave is drawn by hand</span><span class="l-fr">En animation, chaque vague est dessinée à la main</span></h2>
@@ -272,7 +287,7 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
   </div>
 </section>
 
-<section class="band sand">
+<section class="band">
   <div class="wrap">
     <p class="kicker"><span class="l-en">The result</span><span class="l-fr">Le résultat</span></p>
     <h2><span class="l-en">One tool, many seas</span><span class="l-fr">Un outil, de nombreuses mers</span></h2>
@@ -287,7 +302,7 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
   </div>
 </section>
 
-<section class="band">
+<section class="band sand">
   <div class="wrap">
     <p class="kicker"><span class="l-en">Six months of tests</span><span class="l-fr">Six mois d'essais</span></p>
     <h2><span class="l-en">From first tests to the final tool</span><span class="l-fr">Des premiers tests à l'outil final</span></h2>
@@ -305,7 +320,7 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
   </div>
 </section>
 
-<section class="band sand">
+<section class="band">
   <div class="wrap">
     <p class="kicker"><span class="l-en">The formula</span><span class="l-fr">La formule</span></p>
     <h2><span class="l-en">A wave described by a curve</span><span class="l-fr">Une vague décrite par une courbe</span></h2>
@@ -333,21 +348,7 @@ footer{padding-block:36px 56px;color:var(--muted);font-size:14px;border-top:1px 
   </div>
 </section>
 
-<section class="band" id="jouer">
-  <div class="wrap">
-    <p class="kicker"><span class="l-en">Try it</span><span class="l-fr">À essayer</span></p>
-    <h2><span class="l-en">The real settings, live</span><span class="l-fr">Les vrais réglages, en direct</span></h2>
-    <p class="lead"><span class="l-en">These sliders mirror the settings of the tool's panel in Maya and update the sea in real time. Presets are also available.</span><span class="l-fr">Ces curseurs reprennent les réglages du panneau de l'outil dans Maya et modifient la mer en temps réel. Des préréglages sont aussi disponibles.</span></p>
-    <div class="play-grid fam">
-      <div class="play-stage">
-        <canvas id="pg" width="576" height="324" aria-label="Live beach driven by the settings"></canvas>
-        <div class="play-bar"><button type="button" class="ae-btn" id="pg-play">Pause</button><span class="hint-s"><span class="l-en">Simplified version running in the browser. The real render is made in Maya with Arnold.</span><span class="l-fr">Version simplifiée qui tourne dans le navigateur. Le vrai rendu est fait dans Maya avec Arnold.</span></span></div>
-      </div>
-      <div class="ae" id="pg-panel" aria-label="Settings panel"></div>
-    </div>
-  
-  </div>
-</section>
+
 
 <section class="band sand">
   <div class="wrap">
